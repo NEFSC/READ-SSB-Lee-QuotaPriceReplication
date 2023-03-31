@@ -1,0 +1,41 @@
+Stock,Total,Commercial,Sector,Common Pool,Recreational,Herring Fishery,Scallop Fishery,Small Mesh,State Water,Other,Year,data_type
+GB Cod,3506,,,,,,,,,,2009,ACL
+GOM Cod,10327,,,,,,,,,,2009,ACL
+GB Haddock,86520,,,,,,,,,,2009,ACL
+GOM Haddock,1564,,,,,,,,,,2009,ACL
+GB Yellowtail Flounder,1617,,,,,,,,,,2009,ACL
+SNE Yellowtail Flounder,389,,,,,,,,,,2009,ACL
+CC/GOM Yellowtail Flounder,860,,,,,,,,,,2009,ACL
+Plaice,3214,,,,,,,,,,2009,ACL
+Witch Flounder,928,,,,,,,,,,2009,ACL
+GB Winter Flounder,2004,,,,,,,,,,2009,ACL
+GOM Winter Flounder,379,,,,,,,,,,2009,ACL
+SNE/MA Winter Flounder,,,,,,,,,,,2009,ACL
+Redfish,8614,,,,,,,,,,2009,ACL
+White Hake,2376,,,,,,,,,,2009,ACL
+Pollock,6486,,,,,,,,,,2009,ACL
+Northern Windowpane,299,,,,,,,,,,2009,ACL
+Southern Windowpane,338,,,,,,,,,,2009,ACL
+Ocean Pout,,,,,,,,,,,2009,ACL
+Halibut,68,,,,,,,,,,2009,ACL
+Wolffish,,,,,,,,,,,2009,ACL
+GB Cod,,3290,3167,123,,,,,,,2009,Catch
+GOM Cod,,7173,6575,598,,,,,,,2009,Catch
+GB Haddock,,7462,7373,89,,,,,,,2009,Catch
+GOM Haddock,,556,544,12,,,,,,,2009,Catch
+GB Yellowtail Flounder,,998,987,11,,,,,,,2009,Catch
+SNE Yellowtail Flounder,,157,118,39,,,,,,,2009,Catch
+CC/GOM Yellowtail Flounder,,577,529,48,,,,,,,2009,Catch
+Plaice,,1513,1499,14,,,,,,,2009,Catch
+Witch Flounder,,980,968,12,,,,,,,2009,Catch
+GB Winter Flounder,,1781,1777,4,,,,,,,2009,Catch
+GOM Winter Flounder,,239,154,85,,,,,,,2009,Catch
+SNE/MA Winter Flounder,,87,74,13,,,,,,,2009,Catch
+Redfish,,1489,1483,6,,,,,,,2009,Catch
+White Hake,,1955,1909,46,,,,,,,2009,Catch
+Pollock,,7269,7084,185,,,,,,,2009,Catch
+Northern Windowpane,,18,0,18,,,,,,,2009,Catch
+Southern Windowpane,,20,0,20,,,,,,,2009,Catch
+Ocean Pout,,1,0,1,,,,,,,2009,Catch
+Halibut,,20,6,14,,,,,,,2009,Catch
+Wolffish,,37,0,37,,,,,,,2009,Catch

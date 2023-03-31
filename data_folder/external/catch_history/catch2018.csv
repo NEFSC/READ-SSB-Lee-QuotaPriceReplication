@@ -1,0 +1,41 @@
+Stock,Total,Commercial,Sector,Common Pool,Recreational,Herring Fishery,Scallop Fishery,Small Mesh,State Water,Other,Year,data_type
+GB Cod,"1,519","1,360","1,170",24,,,,,16,143,2018,ACL
+GOM Cod,666,610,357,12,220,,,,47,9,2018,ACL
+GB Haddock,"46,312","44,659","44,340",319,,680,,,487,487,2018,ACL
+GOM Haddock,"12,409","12,096","8,641",98,"3,358",122,,,95,95,2018,ACL
+GB Yellowtail Flounder,206,188,185,3,,,15,4,NA,0,2018,ACL
+SNE Yellowtail Flounder,66,43,35,8,,,3,,2,17,2018,ACL
+CC/GOM Yellowtail Flounder,490,398,381,17,,,,,51,41,2018,ACL
+Plaice,"1,649","1,580","1,552",28,,,,,35,35,2018,ACL
+Witch Flounder,948,849,811,18,,,,,40,60,2018,ACL
+GB Winter Flounder,787,731,725,6,,,,,NA,57,2018,ACL
+GOM Winter Flounder,428,357,339,18,,,,,67,4,2018,ACL
+SNE/MA Winter Flounder,700,518,456,62,,,,,73,109,2018,ACL
+Redfish,"10,986","10,755","10,705",50,,,,,116,116,2018,ACL
+White Hake,"2,794","2,735","2,715",21,,,,,29,29,2018,ACL
+Pollock,"38,204","37,400","37,170",230,,,,,402,402,2018,ACL
+Northern Windowpane,86,63,NA,63,,,18,,2,3,2018,ACL
+Southern Windowpane,457,53,NA,53,,,158,,28,218,2018,ACL
+Ocean Pout,120,94,NA,94,,,,,3,23,2018,ACL
+Halibut,100,77,NA,77,,,,,21,2,2018,ACL
+Wolffish,84,82,NA,82,,,,,1,1,2018,ACL
+GB Cod,887.3,837.9,831.6,6.3,,,,,8,41.5,2018,Catch
+GOM Cod,504.5,461.9,309.2,5.8,146.9,,,,37.9,4.7,2018,Catch
+GB Haddock,5324.3,5143.7,5139.2,4.4,,43.9,,,17.1,119.7,2018,Catch
+GOM Haddock,3605.9,3465.1,2837.1,33,595,,,,51.4,89.4,2018,Catch
+GB Yellowtail Flounder,40.5,27.6,27.6,,,,12.7,0.1,,0,2018,Catch
+SNE Yellowtail Flounder,14.7,8.5,7,1.5,,,2.6,,0.2,3.5,2018,Catch
+CC/GOM Yellowtail Flounder,254.7,170.3,164.8,5.5,,,,,55.4,29,2018,Catch
+Plaice,1147.9,1078.4,1064.7,13.7,,,,,23.4,46.1,2018,Catch
+Witch Flounder,906.1,811.8,794.1,17.7,,,,,26.6,67.6,2018,Catch
+GB Winter Flounder,465.1,419.9,419.9,,,,,,,45.2,2018,Catch
+GOM Winter Flounder,233.9,91.7,90.6,1.1,,,,,134.6,7.6,2018,Catch
+SNE/MA Winter Flounder,398,250.7,228.7,22,,,,,15.9,131.3,2018,Catch
+Redfish,5369.1,5362.1,5360.9,1.2,,,,,2.6,4.4,2018,Catch
+White Hake,2113.1,2097.1,2095.4,1.7,,,,,0.4,15.7,2018,Catch
+Pollock,4179.1,3480.8,3475.8,5,,,,,481.1,217.3,2018,Catch
+Northern Windowpane,56.7,33.3,33,0.3,,,22.3,,0.4,0.7,2018,Catch
+Southern Windowpane,454.7,66.5,49.7,16.8,,,157.1,,26.1,205,2018,Catch
+Ocean Pout,53.7,17.1,17,0.1,,,,,0.4,36.2,2018,Catch
+Halibut,103.3,70.8,70.1,0.7,,,,,31,1.6,2018,Catch
+Wolffish,1.6,1.5,1.4,0.1,,,,,0,0.1,2018,Catch

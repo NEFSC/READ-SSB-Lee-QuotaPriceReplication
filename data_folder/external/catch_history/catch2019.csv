@@ -1,0 +1,41 @@
+Stock,Total,Commercial,Sector,Common Pool,Recreational,Herring Fishery,Scallop Fishery,Small Mesh,State Water,Other,Year,data_type
+GB Cod,,,"1,514",,,,,,,,2019,ACL
+GOM Cod,,,349.6,,,,,,,,2019,ACL
+GB Haddock,,,"52,432",,,,,,,,2019,ACL
+GOM Haddock,,,"8,216",,,,,,,,2019,ACL
+GB Yellowtail Flounder,,,97,,,,,,,,2019,ACL
+SNE Yellowtail Flounder,,,36,,,,,,,,2019,ACL
+CC/GOM Yellowtail Flounder,,,377,,,,,,,,2019,ACL
+Plaice,,,"1,436",,,,,,,,2019,ACL
+Witch Flounder,,,831,,,,,,,,2019,ACL
+GB Winter Flounder,,,742,,,,,,,,2019,ACL
+GOM Winter Flounder,,,337,,,,,,,,2019,ACL
+SNE/MA Winter Flounder,,,444,,,,,,,,2019,ACL
+Redfish,,,"10,915",,,,,,,,2019,ACL
+White Hake,,,"2,714",,,,,,,,2019,ACL
+Pollock,,,"37,152",,,,,,,,2019,ACL
+Northern Windowpane,,,NA,,,,,,,,2019,ACL
+Southern Windowpane,,,NA,,,,,,,,2019,ACL
+Ocean Pout,,,NA,,,,,,,,2019,ACL
+Halibut,,,NA,,,,,,,,2019,ACL
+Wolffish,,,NA,,,,,,,,2019,ACL
+GB Cod,,,530.5,,,,,,,,2019,Catch
+GOM Cod,,,280.9,,,,,,,,2019,Catch
+GB Haddock,,,5293.5,,,,,,,,2019,Catch
+GOM Haddock,,,3544.4,,,,,,,,2019,Catch
+GB Yellowtail Flounder,,,3.1,,,,,,,,2019,Catch
+SNE Yellowtail Flounder,,,2.5,,,,,,,,2019,Catch
+CC/GOM Yellowtail Flounder,,,141.1,,,,,,,,2019,Catch
+Plaice,,,836.1,,,,,,,,2019,Catch
+Witch Flounder,,,761,,,,,,,,2019,Catch
+GB Winter Flounder,,,306.2,,,,,,,,2019,Catch
+GOM Winter Flounder,,,56.9,,,,,,,,2019,Catch
+SNE/MA Winter Flounder,,,135.1,,,,,,,,2019,Catch
+Redfish,,,4956.9,,,,,,,,2019,Catch
+White Hake,,,2057.4,,,,,,,,2019,Catch
+Pollock,,,3070.1,,,,,,,,2019,Catch
+Northern Windowpane,,,21.7,,,,,,,,2019,Catch
+Southern Windowpane,,,30,,,,,,,,2019,Catch
+Ocean Pout,,,18.4,,,,,,,,2019,Catch
+Halibut,,,76.6,,,,,,,,2019,Catch
+Wolffish,,,2.4,,,,,,,,2019,Catch
