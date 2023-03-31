@@ -1,0 +1,821 @@
+---
+title: Groundfish Quota Prices
+date: "`r format(Sys.time(), '%B %d, %Y')`" 
+documentclass: elsarticle
+classoption: endfloat, 1p
+csl: fisheries-research.csl
+abstract: "In 2010, the Northeast United States groundfish fishery adopted a catch share system in which Annual Catch Entitlements (quota) are allocated to groups of firms, known as sectors.  The quota market has many features that differ from an ideal market: trades are facilitated by sector managers, completed trades are not easily seen by all, and both  package and barter trades are common.  This paper examines quota prices using a two stage econometric model. In the first stage, transactions data are used to estimate the prices of individual stocks of quota.  In the second stage, a hurdle model is used to understand the determinants of quota prices. Despite the many quirks inherent in groundfish management, quota prices are affected by fundamentals in reasonable ways: increases in output prices and decreases in quota available both increase quota prices.  Increases in monitoring rates also increase quota prices,  evidence that at least some of the groundfish fleet is not always compliant with fishing regulations when not observed."
+keywords: "Catch Shares, Quota Prices, Fisheries Economics"
+output:
+  pdf_document: 
+    includes:
+      in_header: preamble-latex.tex
+    keep_tex: yes
+    pandoc_args: --pdf-engine=pdflatex
+    number_sections: true
+  word_document: null
+  html_document: null
+fontsize: 12pt
+bibliography: MLacepricebibliography.bib
+
+---
+\nofiglist
+\notablist
+<!---
+Fisheries Research -- 
+Note, The abstract doesn't show up when you compile the doc. You have to move the \maketitle below the \begin{abstract} \end{abstract} environment, and then build the .tex to .pdf
+
+
+
+--->
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(here)
+here::i_am("Groundfish Quota Prices.Rmd")
+my_projdir<- here()
+
+# This file needs to be run 1 time (ever). It sets up folders. After your first knit, you can comment it out (although leaving it in will not hurt
+#source(file.path(my_projdir,"project_logistics","R_paths_libraries_setup.R"))
+source(file.path(my_projdir,"R_code","project_logistics","R_paths_libraries.R"))
+setwd(my_projdir)
+descriptive_images<-file.path(my_images,"descriptive")
+exploratory_images<-file.path(my_images,"exploratory")
+allstocks<-c("CCGOM_yellowtail","GBE_cod","GBW_cod","GBE_haddock","GBW_haddock","GB_winter","GB_yellowtail","GOM_cod","GOM_haddock","GOM_winter","plaice","pollock","redfish","SNEMA_yellowtail","white_hake","witch_flounder","SNEMA_winter")
+
+GBstocks<-c("GBE_cod","GBW_cod","GBE_haddock","GBW_haddock","GB_winter","GB_yellowtail")
+unit_stocks<-c("plaice","pollock","redfish","white_hake","witch_flounder")
+GOMSNE_stocks<-c("GOM_cod","GOM_haddock","GOM_winter","CCGOM_yellowtail","SNEMA_yellowtail","SNEMA_winter")
+
+
+GBstock_nums<-c(2,3,4,5,6,7)
+unit_stock_nums<-c(11,12,13,15,16,999)
+GOMSNE_stock_nums<-c(14,17,1,8,9,10)
+unit_stock_nums2<-c(11,12,13,15,16)
+
+vintage_string<-"2022_03_04"
+#load in the estimation datasets and coefficients.
+save_out<-paste0("quarterly_estimation_results_",vintage_string,".RData")
+save_out<-file.path(data_main,save_out)
+load(save_out)
+
+
+```
+
+<!---
+Min-Yang's Linux bib is:
+bibliography: "C:/Users/Min-Yang.Lee/Documents/library.bib"
+
+-->
+
+\doublespacing
+
+\linenumbers
+# Introduction
+
+Catch share programs, in which the rights to catch a certain amount of fish are allocated to individual entities, have been increasingly incorporated into fisheries management in the United States [@Brinson2016]. Conditional on quotas set at appropriate levels, construction of a high-quality property right has been viewed by economists as the path to efficiency in fisheries [@Arnason2012].  By allocating a fixed share of the annual catch to an individual entity, catch share systems change incentives, leading to anticipated and unanticipated changes in behavior and outcomes. Catch share programs have been found to lead to improvements along in many metrics, including productivity [@Weninger1998;@Walden2012;@Fare2015], revenue [@Scheld2012;@Kroetz2017], profitability [@Fox2003], output quality [@Casey1995;@Kroetz2019; @Ardini2018], prices [@Dupont2005; @Pincinato2022], season length [@Agar2014; @Birkenbach2017; @Hsueh2017], safety [@Pfeiffer2016; @Pfeiffer2022], and crew compensation [@Abbott2010b; @Steiner2018; @Abbott2022].  
+
+Catch shares are not a solution to all problems of all fisheries and may be difficult to implement in some situations [@Copes1986]. They may have unintended consequences, including detrimental impacts on fishing communities and related sectors [@Matulich1996;@McCay2004;@Olson2011], increased concentration of the fishery  [@Palsson1995; @Eythorsson1996; @Abayomi2012], changes in social capital [@McCay1995] and way-of-life [@Carothers2012].  Gains from the transition to catch shares are likely to be unequally distributed [@Dupont2005; @Grainger2016] among participants and windfalls associated with free allocations [@Copes1996; @Bromley2009] can exacerbate inequality.  Furthermore, allocating the right to catch a fraction of the total quota does not guarantee that the quota itself will be set at the optimal level [@Bromley2009]. 
+
+Catch share programs vary tremendously in their ecological, economic, and institutional settings [@Olson2011;@Brinson2016] and seemingly minute differences in administrative details of any policy can affect outcomes greatly [@Klemperer2002;@Duflo2017].  For example, discarding incentives emerge if output is differentiated (perhaps due to prices that vary based on size) but quota management is based on aggregate catch [@Arnason1994].  Incentives to high-grade emerge when quota management is based on landings instead of catch [@Arnason1994]; a landings restriction can  reduce these incentives [@Anderson1994].  Variations in the quality of the property right along the dimensions of exclusivity, security, permanence, and transferability affect the value of the property right to firms and consequently affect market prices of those rights [@Arnason2012;@Grainger2014].  Within-season exclusivity allows firms to land fish during times of lower costs or higher prices and to shift to non-catch share fisheries when advantageous to do so [@hutniczak2014increasing;@Cunningham2016; @Birkenbach2017; @Birkenbach2020]. Catch share system with a high degrees of permanence and security, in which the right is both unlikely to be expropriated and long-lived, can encourage firms to make appropriately long-lived capital investments [@Arnason2005].  Transferability in catch share systems allows firms to adjust both the scope and scale of their operations. A well-functioning market facilitates allocative efficiency, in which quota is transferred to firms that earn the highest profits from that quota.  However, fishery managers often restrict the transferability to limit consolidation in the fishing industry; these restrictions affect outcomes and opportunity costs [@Anderson2004;@Lee2012;@Kroetz2015]. 
+
+<!---
+Turn it more optimistic.
+
+Even though all the conditions for efficiency are exceedingly unlikely to be present in any quota market, incremental refinements to the market institutions to can improve the ability of the market to allocate resources to it's best purposes.
+
+
+
+informational differences [@Ropicki2014] may impact prices in these newly created markets.
+
+ The compensation for quota paid by the buyer to the seller is a transfer payment that does not factor directly into costs or benefits of switching to a tradable catch share system.  However, these payments represent benefits that accrue to sellers and costs that accrue to both buyers. Due to the lay system [@McConnell2006] prevalent in most fisheries, a portion of those costs are passed along to crew [@Steiner2018; @Abbott2022].  
+
+--->
+
+In multispecies fisheries, like the Northeast US groundfish fishery, many species are caught simultaneously [@Squires1991;@Salvanes1995;@Scheld2018].  Understanding of the price of quota can provide fishery management insights. Quota share prices can be used by managers to set quotas that maximize the value of the fishery [@Arnason1990; @Batstone2003].  Monitoring these prices can provide insight to managers about the marginal profits in the fishery [@Arnason2012;@Agar2014].  Prices that emerge from a well-functioning quota market provide information about relative scarcity.  These price signals may change behavior at the extensive margin by encouraging firms to exit [@Grafton1996;@Lian2010;@Reimer2014M; @Kroetz2017; @Kroetz2019]. Quota prices also provide high powered incentives for firms to avoid certain stocks. This can lead to improvements in selectivity and profits compared to policy instruments that do not provide these finely tuned incentives [@Branch2008;@Abbott2015; @Scheld2018].  However, these incentives can also produce undesirable outcomes; catch share managed firms fishing for groundfish have been shown to behave differently when there is a fishery observer on the vessel [@Demarest2019].
+
+Transferrability and allocative efficiency are a key feature of a tradable catch share system. Markets can fail to efficiently allocate goods to their best purposes for many reasons; imperfect information and transactions costs are common reasons.  Imperfect information refers to situations when market participants do not fully understand the production environment or there is substantial uncertainty about the environment.  Transactions costs might arise if it is difficult to find a counterparty, time consuming to complete a trade, or if it is difficult to observe prices.  These conditions are often present in established markets for everyday goods like used automobiles [@Akerlof1970], real estate [@Harding2003], or groceries [@Smith2004b].  If the newly-created quota market suffers from imperfections, the noisy prices that emerge are unlikely to provide the signals that will encourage efficient use of quota [@Stavins1995; @Newell2005].
+
+In this article, we examine the determinants of quota prices in the Northeast United States Multispecies (groundfish) fishery. Package and barter trades are frequent, as are quota prices of zero.  In general, we find that quota prices are determined by factors fundamental to the production process in the fishery: scarcity and fish prices matter, suggesting that the market is relatively well-functioning  [@Newell2005; @Jin2019]. 
+
+
+# Background - the Northeast U.S. Groundfish Fishery {#background}
+
+
+<!--
+Quota have attributes of real options [@Anderson1987; @Krishna1996] and are an intermediate good required for firms to catch of fish in a catch share fishery. 
+
+Because US fisheries are managed with regional fishery management councils, in which industry members provide input into fishery management, it is not particularly surprising that this was done like this.  
+
+Should weave in @Hannesson2017a, who recovers quota prices from cost and earnings
+
+
+ITQs have been used in New Zealand, Canada, and Europe for years. None of the analyses of quota markets have accounted for the jointness in production.  Many have at alluded to this as part of motivation for understanding how IFQ prices evolve.
+
+Use this as an input to a larger model of behavior.  Understand if this is functioning (@Jin2019's motivation).  
+
+Really need some better motivation
+-->
+
+The Northeast groundfish fishery is managed the U.S. National Marine Fisheries Service (NMFS) with advice from the New England Fishery Management Council (NEFMC) and has operated under a catch share system since 2010 [@Swasey2021].  Prior to 2010, the fishery was managed with a complicated system of regulations on fishing time, gear, and possession limits [@Hennessey2000;@Brodziak2008].  While participation in the sector program is voluntary, the majority of commercial landings (roughly 95-98 percent of commercial groundfish allocation) are attributable to vessels that participate in the catch share program.  Participants in the fishery typically use gillnets or bottom trawls.  The fishery is characterized by joint production (technical interactions) of outputs [@Squires1987a; @Squires1987; @Scheld2018]; firms determine their output of all stocks simultaneously and increases in the catch of one stock will necessitate changes the catch of others.  Some pairs of stocks, like Gulf of Maine (GOM) cod and GOM haddock are likely to be caught together on a bottom-trawl haul or gillnet set.  Others pairs, like  GOM cod and redfish are less likely to be caught together. Still other pairs, like GOM cod and Georges Bank (GB) cod, by definition, are not caught simultaneously.  This jointness implies that it can be costly or difficult for firms to avoid a stock with low quota.  Selectivity [@Scheld2018], quota levels [@Swasey2021], and stock conditions [@NEFSC2017] have been changing over time.
+
+Since 2010, shares of the Annual Catch Limits for fifteen stocks[^fn_stocks] of nine species have been allocated to harvesting cooperatives, known as sectors. Members of a sector are jointly and severably liable for ensuring that the sector does not exceed its quota.  The precise allocations are based on the fishing history of their member vessels. These sectors frequently were formed based on common business interests, geographic proximity, or existing social relationships [@Holland2013].  The quota, known as Annual Catch Entitlements (ACE), represent the maximum quantity of each stock that a sector is allowed to catch during the year. 
+
+[^fn_stocks]: In 2010, the allocated catch share fishery included 14 stocks of 9 species: Georges Bank (GB) and Gulf of Maine (GOM) cod (\textit{Gadus morhua}); GB haddock and GOM haddock (\textit{Melanogrammus aeglefinus}); GB, Southern New England/Mid-Atlantic (SNEMA), and Cape Cod/Gulf of Maine (CC/GOM) yellowtail flounder (\textit{Limanda ferruginea}); GB and GOM winter flounder (\textit{Pseudopleuronectes americanus}); American plaice flounder (\textit{Hippoglossoides platessoides}); pollock (\textit{Pollachius virens}); redfish (\textit{Sebastes fasciatus}); white hake (\textit{Urophycis tenuis}); and witch flounder (\textit{Glyptocephalus cynoglossus}).  SNE/MA  Winter Flounder was added to the catch share program in 2012.  In addition, the multispecies complex includes several unallocated stocks -- Atlantic halibut (\textit{Hippoglossus hippoglossus}),  ocean pout (\textit{Zoarces americanus}), windowpane flounder (\textit{Scophthalmus aquosus}), and Atlantic wolffish (\textit{Anarhichas lupus}), which are not managed with catch shares.  Vessels fishing for groundfish will also frequently catch other species.  
+
+While each of the sectors develops its own operations plan for managing members' activities, there are many commonalities.  All sectors allow fishermen to use own quota as they see fit [@Holland2015], and quota holders may fish their allocations themselves, trade them within their sector, or trade across sectors[^fn_bank].  The operations plans also typically include a right-of-first refusal clause that allows sector members to buy quota that would be otherwise sold out of the sector.  To mitigate the risk of exceeding their quota allocation,  sectors typically reserve a fraction of quota, often releasing some of it near the end of the fishing year.  In order to fish, a sector must hold quota for all stocks that they may encounter in the stock area where they fish.  A small number of sectors, comprised exclusively of inactive quota owners, operate as lease-only sectors and often offer discounted quota to favored firms to achieve social objectives like community participation.
+
+[^fn_bank]: Banking is allowed up to 10\% of initial allocation. If banking this much would cause the subsequent year's catch to be higher than the biologically appropriate, then the banking is 1\%.  Banking of valuable stocks is infrequent.
+
+ <!---For some stocks, other fleets catch  
+(mostly Gulf of Maine Cod and haddock), the recreational fishery is allocated and catches a sizable fraction of the total catch limit [see @Lee2017].  Fleets targeting other stocks are also allocated portions of the catch limits by fishery managers.--->
+There are three stocks (Georges Bank cod, haddock, and yellowtail flounder) for which the U.S. shares management responsibility with Canada.   Quota for the Georges Bank cod and haddock stocks are split into two subcomponents, East and West. U.S. Catch of the GB East component cannot exceed the bilaterally negotiated maximums and the total Georges Bank catch cannot exceed the US ACL. Starting in 2014, quota holders have been allowed to convert GBE haddock quota into GBW haddock quota; the corresponding conversion for cod was allowed beginning in 2016.  GBW quota cannot be converted to GBE quota. Economic theory suggests that, when convertible, the GBE quota should be priced greater than or equal to the price of GBW quota.  If this were not the case, quota owners could arbitrage by purchasing inexpensive GBE cod, converting it to GBW cod, and immediately selling it at a higher price, eliminating the price differential.
+
+Landings are monitored by reports from fish dealers.  Area fished, and therefore the stock, is self-reported.  All legal-sized fish must be landed and discards of sub-legal catch count against the sector's quota allocation.  Fishery observers are deployed on trips to monitor the amount of discards that occur. These monitors are deployed across vessels in the Northeast US with the aim of achieving a precision standard on discards of all stocks.  For trips with a fishery observer, actual discards are recorded; when an observer is not present, an estimated discard rate, based on similar observed trips, is used.  Discard rates for non-observed trips are continually changing during the year as additional trips are observed, which causes changes in the amount of quota used by a vessel on non-observed trip, even after a trip occurs.  It is therefore difficult for firms to precisely know their own quota holdings on a day-to-day basis.  Coverage of the groundfish fleet is fairly low; from 2010-2019, 14-32\% of groundfish trips were observed in each year [@GARFO2021].  There is some evidence that firms adjust behavior when carrying an observer, making resulting data non-representative of unobserved trips. Trawlers and gillnetters tend take shorter trips, keep less fish, and earn less revenue when an observer is present [@Demarest2019].  Landings composition, measured by  groundfish prices or diversity of landed size categories, of the observed trips also differs systematically between observed and unobserved trips and these differences did not exist prior to the implementation of catch shares [@Demarest2019]. 
+
+Quota prices provide high-powered incentives for firms to avoid being charged for that quota.  When all catch is observed, firms will undertake costly steps to avoid high-priced stocks, an intended consequence of this policy.  When not all catch is observed, firms may rationally not comply with fisheries regulations.  Without an observer onboard, there are strong incentives to discard legal-sized fish, misreport species [@Cramer2017], and misreport stock areas [@Palmer2017] for stocks with high quota prices.  A simple theoretical model sketch illustrates the implications for quota prices.  Firms have a range of skill in avoiding discards; some are good at doing so and other are not. On a trip without an observer, a firm has the freedom to report either its true amount of discards or a lesser amount (non-compliance). On a trip with an observer, a firm’s true discards are reported by the observer. If all vessels are complying with fishery regulations, then the true discards are reported on all trips and changes in observer coverage rates cannot have an effect on either aggregate demand for quota or quota prices.  However, if at least one vessel is not complying with fishery regulations, then an increase in the observer coverage rate will increase aggregate demand for quota: more observed trips means more quota must be used.  When aggregate demand for quota increases, the price of quota must increase.
+
+Sector managers, hired by the sector members, track the catch by members and report it to NMFS. The sector managers also serve as information conduits for firms, and facilitate trades of quota by posting bid and ask prices[^posted_prices] [@McCann2012;@Holland2013].  Trades between sectors are reported by the sector manager to NMFS during the fishing year; data collected includes the pounds transferred of each stock and the total compensation. Trades within a sector are reported to NMFS at the end of the fishing year.   Quota can be transferred multiple times in a year. After the end of the fishing year, quota holders have a short window to make trades to balance any unanticipated overages.  While quota shares can be permanently transferred at prices that reflect discounted future returns and property right quality [@Newell2007; @Arnason2012;@Grainger2014]; these transactions occur less frequently in this fishery.  We focus on the quota leasing market, which involves transfers of quota pounds for use within the fishing year and use the terms "lease", "sale", and "transaction" interchangeably from this point forward.  
+
+[^posted_prices]: For example, the Sustainable Harvest Sector posts bid and ask quantity and prices at http://www.groundfish.org/shs/?page_id=15.  Accessed on June 9, 2022.
+
+
+In many U.S. catch share fisheries, quota markets are often opaque and characterized by a lack of posted prices [@Holland2015a; @Jin2019].  In the Northeast U.S. groundfish quota market, in which 14 stocks of nine species are traded, even monitoring the quota prices is difficult for fisheries managers.  Quota is allocated to sectors (groups of fishermen), trades are often facilitated through sector managers, and participants may not be able to easily observe the prices of completed trades [@McCann2012].  Trades involving many stocks packaged into a single transaction and barters of one package of quota for another are common.  Package and barter trades are common in fisheries that are characterized by joint production and allow producers to take advantage of complementarities in the production process and reduce transactions costs [@Iftekhar2012;@Innes2014a; @Holland2016]. However, these types of transactions make it difficult for firms to observe the market prices of quota.  Rigorously testing for market efficiency is difficult [@Fama1998]; we follow previous efforts and examine whether quota prices in the Northeast US multispecies fishery are influenced by underlying fundamentals that are suggested by economic theory [@Newell2005;@Jin2019].  
+
+# Materials and Methods
+
+Our goal in this research is to understand the determinants of quota prices.  Three empirical considerations guide our choice of methods: package and barter trades, frequent quota prices of zero, and joint production. Because of the prevalence of package and barter trades, we cannot directly observe all quota prices and a two-step hedonic approach is necessary. In the first step, we estimate a hedonic price function on transactions-level data to recover the per-pound price of quota for each stock [@Holland2013; @Murphy2018].  We estimate 38 models, one for each quarter of each fishing year.  In the second step, we estimate a reduced form model to explain the variation in quota prices using output prices, quota availability, and other explanatory variables.  As a real option, quota has many source of value; however, an expectation of scarcity is necessary for positive prices [@Anderson1987;@Krishna1996].  "Corner solutions," characterized by excess supply of quota (low quota utilization rates) and a zero price are prevalent; we account for this empirical regularity using a hurdle model [@Cragg1971; @Wooldridge2010B]. @Hatcher2022 illustrates that this situation can occur if there are more stocks of fish than technologies (fleets) used to capture them.  The phenomenon of joint production implies that attributes of one stock may affect the quota prices of other stocks. We model joint production by constructing spatial weights matrices based on co-occurrence of stocks in fishery-independent survey data and using those spatial weights to estimate Spatial Lag of X (SLX) models [@HalleckVega2015]. There are three primary data sources used in this research; a database of inter-sector trades, a database used for quota monitoring maintained by the Greater Atlantic Region Fisheries Office (GARFO), and fishery-independent survey data collected and maintained by the Northeast Fisheries Science Center (NEFSC).
+
+<!---
+Other researchers have examined determinants of the prices of quota and the functioning of quota markets.  @Newell2005 @Ropicki2014 finds price dispersion in the red snapper quota market is driven by information asymmetries. , GDP, permit bank/frequent sellers, some location or time dummies in the Northeast US Scallop quota market.
+ the possible endogeneity of both market prices and quota available.   Both the amount of quota remaining and the market (output) price of fish are likely to impact quota prices.  However, causality may run the other way; for example, an increase in the quota price of a stock may cause fishermen to catch less of it or to demand a higher price.  We account for this using a control function estimator [@Smith1986; @Wooldridge2015].
+ 
+--->
+## First Stage: Recovering the price of a pound of quota
+
+### Empirical Model
+The hedonic method has frequently been used to understand the implied price of individual characteristics of heterogeneous goods [@Rosen1974;@Freeman2003; @Parmeter2009].   With data about the price and characteristics of the heterogeneous good, the implied prices of each characteristic can be obtained through statistical methods.  @Holland2013a uses a hedonic model to recover prices in the British Columbia groundfish quota market. Because that empirical setting contained very few cash trades, prices were normalized by a numeraire stock, leading to a complex statistical estimator.  @Murphy2018 estimate annual models of Northeast Groundfish quota prices for 2010-2015; those specifications cannot capture  changes in the value of quota within the fishing year as operating and environmental conditions change.  Neither the hedonic models of @Holland2013a nor of @Murphy2018  further examine determinants of the prices of quota. 
+
+The heterogeneous good is a bundle containing one or  more stocks of quota that is either sold for cash or exchanged for another bundle of quota.  Because a bundle of quota could be divided or repackaged at relatively low transactions cost, a linear functional form is appropriate [@Rosen1974].  Therefore, the first stage of the hedonic model estimates the following linear equation:
+<!--@Rosen1974 describes indivisibility by stating that "two 6-foot cars are not equivalent to one 12 feet in length"  -->
+\begin{equation}
+Compensation_{kt}=\sum_{i=1}^N r_{it}Q_{ikt} + d_{t} leaseonly_{kt}*totalpounds_{kt} + c_{t} + \varepsilon_{kt}\label{dem1}
+\end{equation}
+
+where $Q_{ikt}$ is the pounds of quota of stock $i$ transferred in trade $k$ during quarter $t$; $r_{it}$ is the corresponding implied price of a pound of quota, $leaseonly$ is an indicator variable that is 1 for a lease-only selling sector and 0 otherwise, $totalpounds$ are the total quota pounds transferred in a transaction, $c_{t}$ is a constant, and $\varepsilon_{kt}$ is an iid error term. The $Leaseonly_{kt}*totalpounds_{kt}$ interaction controls for the per-pound discount that leasing sectors give relative to the prevailing market price.   <!---Neither *leaseonly* nor *totalpounds* are included individually[^fn_leaseonly].
+
+[^fn_leaseonly]: Including *leaseonly* would imply that the lease only sectors provide a fixed discount per sales transaction. Based on conversations with sector managers, this does not occur.--->
+
+We estimate Equation \ref{dem1} independently for each of the 38 quarters[^fn_pooled]. In some quarters, there are few trades of a particular stock, and thin data can lead to imprecise parameter estimates.  Data cleaning and preparation consists of excluding the quantity traded of a stock when there are fewer than 5 trades of that particular stock.  Some of the self-reported transaction values may be unrealistic as protest responses [@Jin2019]; we therefore exclude  transactions that reported a price of less than \$0.005 or higher than \$6 per pound of quota.  Finally, we estimated preliminary models and removed outliers (with a Cook's D greater than 2) from the estimation dataset prior to estimating a final model.  We used Huber-White-Eicker standard errors robust to arbitrary heteroskedasticity  to perform inference in the first stage.
+
+We check for robustness by estimating models that exclude one or both data cleaning steps.  The results are generally similar across the alternative models, with two exceptions. The first is the fourth quarter of 2012, when the baseline model selection process led to exceedingly poor model fit ($R^2=0.25$).  Closer inspection revealed that a handful of excluded stocks with few observations had large positive prices in the previous quarter.  For this quarter, we employed only the outlier screening step.  The second exception are a handful of stock-quarters combinations with one or two  transactions.  In the baseline specification, these columns were excluded.  When they were included, they were typically associated with implausible point estimates and large standard errors.  For example, there were only two trades of GBE Haddock in the fourth quarter of 2010 and the estimate of the quota price without data cleaning was estimated to be a rather implausible -$15,000 per pound with a corresponding standard error of over 2,300.  
+
+[^fn_pooled]: Estimating a pooled model with interactions between each of the 38 time periods and explanatory variable in Equation \ref{dem1} would be equivalent.  However, it would make the subsequent model refinement steps (outlier detection) difficult.
+
+
+### Data
+The inter-sector trade data are the only data used in the first stage; low quality of the compensation variable unfortunately precludes inclusion of within-sector trade data in this analysis. These data are self-reported to NMFS in real-time and contain the sector that the buyers and sellers belong to, the amount of quota transferred between parties, the total compensation for the quota, and the transaction date.  For barter transactions, where one package of quota pounds are exchanged another, we follow @Holland2013 and code quota pounds going in one direction as positive values and the other direction as negative.  Exchanges of  quota for non-cash considerations were excluded.  The first stage of the model was estimated using nominal dollars. 
+
+<!--
+For the second stage, all prices and values were deflated to first quarter 2010US dollars using the GDP Implicit Price Deflator; this is equivalent to deflating the total compensation variable in the first stage.
+
+For trades in which parties barter quota for other quota, we simply code the transfer in one direction as negative. When we report summary statistics or construct the total pounds variable, we use absolute values.
+
+Descriptives are computed here
+See the wrapper file
+\stata_code\analysis\wrapper_first_stage.do
+
+\stata_code\analysis\exploratory\first_stage_exploratory1_POP.do
+\stata_code\analysis\exploratory\graphingA04Q_explore_market_transactions.do
+\stata_code\analysis\exploratory\graphingA05Q_market_volumes.do
+
+\stata_code\analysis\table_making\first_stage_summary_stats_POP.do
+-->
+
+With the exception of the first two quarters of 2010[^fn_agg], when the participants in the fishery were gaining experience with the new quota management system, trading in the market has been fairly brisk.  The importance of trading, relative to total catch, has increased moderately over time (Figure \ref{fig:aggregate_trade_volume}). There are between 55-188 transactions in each quarter, many of which are barter or package trades (Table \ref{quarterly_trades} and Figure \ref{fig:basket_fractions}). The package trades tend to occur earlier in the fishing year, both in absolute (total number of trades) and relative (fraction of the quarterly trades).  This may occur because quota owners that do not intend to fish for groundfish  sell their entire quota holdings early in the year.  Alternatively, owners may be using single stock trades more frequently at the end of the year to precisely match quota holdings to realized catch. While package trades have fallen to approximately 20\% of all trades in recent years, these trades remain quite important in terms of the volume of quota pound transferred (Figure \ref{fig:basket_fractions}).
+
+[^fn_agg]:The fifteen trades from the second quarter of 2010 were pooled with the third quarter of 2010 trades for the first stage econometrics.  
+
+
+
+```{r aggregate_trade_volume, fig.show = "hold", out.width = "75%", fig.cap="Trends in the fraction of quota that are leased and sold. Note: Annual median across fish stocks of the lease transactions divided by total catch (solid) and catch limit (dashed)",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(descriptive_images,paste0("median_trade_volume_", vintage_string,".png")))
+```
+
+
+
+
+```{r quarterly_trades, echo=FALSE, results='asis', eval=FALSE}
+library(knitr)
+ed2<-estimation_dataset[which(estimation_dataset$fy<=2019),]
+
+trades<-table(ed2$fy,ed2$q_fy)
+colnames(trades)<-c("Q1","Q2","Q3","Q4")
+kable(trades, caption="Trades per Quarter")
+```
+
+
+\begin{table}
+  \begin{center}
+    \begin{scriptsize}
+      \input{./tables/first_stage_tabulate_POP.tex}
+      \caption{Quota Transactions Per Quarter\label{quarterly_trades}}
+    \end{scriptsize}
+  \end{center}
+\end{table}
+<!---
+\begin{table}
+  \begin{center}
+    \begin{scriptsize}
+        \input{./tables/first_stage_tabulate_package_swaps_POP.tex}
+        \caption{Package and Barter Transactions Per Quarter\label{quarterly_barter_swaps}}
+    \end{scriptsize}
+  \end{center}
+\end{table}
+
+--->
+
+
+
+```{r basket_fractions, fig.show = "hold", out.width = "48%", fig.cap="Fraction of Market Activity that Occurs in Package and Barter Trades",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(descriptive_images,c("basket_transaction_fractions_POP.png", "byQ_basket_transaction_fractions_POP.png")))
+```
+
+
+
+
+Figures \ref{fig:trades_by_quarter} and \ref{fig:volume_by_quarter} describe the total transactions and traded pounds for each stock by quarter. GBE and GBW haddock tend to trade infrequently; but when trades of these stocks occur, the volumes are high. Infrequent trades causes some difficulty for estimating quota prices for these stocks.  Pollock and redfish trades occur with at a slightly higher rate, but with much higher trade volumes.
+
+<!--
+\iffalse
+Look at first_stage_averages_pr_inter_POP.tex
+Average Price per Pound (nominal)&       0.771&        0.71\\
+Lease-Only Seller   &       0.050&        0.22\\
+        \caption{Summary Statistics for the First Stage. Need to get the proper number of digits for output prices and lease only seller. But you can eyeball those from the other tables.\label{first_summary}}
+
+-->
+
+
+
+```{r trades_by_quarter, fig.show = "hold", out.width = "75%", fig.cap="Quarterly number of trades containing each stock",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(descriptive_images,c("trades_by_quarter_POP.png")))
+```
+
+```{r volume_by_quarter, fig.show = "hold", out.width = "75%", fig.cap="Quarterly volume of quota pounds traded for each stock",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(descriptive_images,c("quota_pounds_transacted_POP.png")))
+```
+
+\begin{table}
+  \begin{center}
+    \begin{scriptsize}
+        \input{./tables/first_stage_averages_POP.tex}
+        \caption{Summary Statistics for the first stage. \label{first_summary}}
+    \end{scriptsize}
+  \end{center}
+\end{table}
+
+Table \ref{first_summary} contains the summary statistics for the estimation dataset in the first stage.  Approximately 5% of trades were by one of the lease-only sectors.  The average transaction sold quota for \$0.77 per pound.
+
+## Second Stage: Three sources of value for quota \label{sec:theory2}
+While recovering the prices of characteristics provides tremendous information to fishery managers [@Arnason1990; @Batstone2003; @Arnason2012], these prices are the result of a market equilibrium. Characterizing the demand or supply curves of characteristics is difficult. In many hedonic applications, including those for real estate and fishing quota, individuals sort themselves into buyers or sellers.  That is, an individual chooses to be a buyer or seller; in the case of barters, an individual is both at the same time.  Because of this endogenous sorting, the standard econometric techniques of using supply- shifters to identify demand and vice-versa are not feasible [@Bishop2019].  Following other researchers [@Newell2005; @Jin2019], we take a reduced form approach to explore the factors that affect quota prices.
+
+Quotas have attributes of financial options; they give the quota holder the ability, but not the obligation, to undertake some economic activity over a fixed period of time [@Anderson1987]. Quota value can be derived from three sources: a scarcity component, an asset market component, and an option value component [@Krishna1996].  The scarcity component is most familiar to fisheries economists; it arises as a direct application of a Walrasian equilibrium when aggregate quota limits are constraining or likely to be constraining [@varian1992microeconomic].  When this occurs, the scarcity value is equal to the marginal profitability of using quota [@Arnason2012], which should be related to output (fish) prices, input prices (fuel and labor), and environmental conditions that affect the aggregate production process.  When quota limits are unconstraining, there is no scarcity value.  In a multispecies fishery with technical interactions, scarcity value can also arise through the joint production process.  This occurs because quota of jointly caught stocks are complements: holding quota for one stock enables a firm to catch and land other stocks of fish.  Quota of stocks that are not caught together are substitutes: if quota is scarce for a GOM stock, some firms will shift effort outside the GOM to avoid the scarce stock.  Less than full monitoring of catch effectively increases the amount of quota available if firms do not comply with the requirement to land all legal-sized fish.  This occurs because non-compliant firms on unobserved trips will match less than one pound of quota against one pound of landings.  Decreases in monitoring rates are therefore expected to reduce the value of quota.   
+
+Quota can also be viewed as capital asset that lasts one year.  In order for an asset holder to hold an asset, they must be compensated for doing so, and the price of quota should rise at the prevailing market rate of interest within a year [@Hotelling1931;@Krishna1996].  If it did not, a quota holder could do better by divesting at the beginning of the year and investing the proceeds, earning that market rate of interest.  When there is uncertainty about the payoff to using quota, option value arises because owning quota on the first day of the fishing year allows the owner to fish or to delay in hope of more favorable environmental or market conditions [@Krishna1996].  Option value only exists if there is a positive probability that the quota will constrain the fishery.  The option value declines as the fishing year progresses and the changes in capital and option values may partially offset each other.  
+
+Using fifteen years of quarterly data on 141 stocks of 30 species; @Newell2005 estimate a reduced-form flexible model to explain prices in the New Zealand quota market; quota prices are influenced by output prices, costs, previous year utilization, cumulative utilization,  macroeconomic factors, and environmental conditions. There are at least three notable differences between our study and that of @Newell2005.  First, @Newell2005 observe stock-level prices directly, while we must recover quota prices from a first-stage model.  Second, @Newell2005 never observe quota prices equal to zero; approximately half of the observations in our dataset are associated with a price of zero.  Third, @Newell2005 have a dataset that is approximately ten times larger  (6,010 stock-quarters compared to 640 stock-quarters); our  smaller dataset warrants parsimony in the empirical specification.   @Jin2019 examine the single-stock General Category IFQ scallop fishery and complexities such as package trades and joint production are not present in their application.   @Jin2019 finds that lease prices are related, among other things, to profitability. 
+
+<!---
+However, methods of value of financial options cannot simply be translated to valuing quota, because the use of quota can change the underlying payoff to using quota.  Intuitively, if many firms use quota to land fish,  output prices will decrease and costs of production will increases (perhaps due to congestion or a stock effect).  
+
+^[Although the application in @Krishna1996 is to export quota licenses, and not fishing quota, the theory is directly applicable].
+
+A fourth form of value, similar to the convenience yield described by @Pindyck1994 and @Pindyck2001 in the context of inventories, arises from the institutional setting of this fishery.  Firms may hold an inventory of quota because simply holding it provides some value or yield. This can occur because firms must hold quota for any stocks of fish that they may encounter when the fish in a particular area of the ocean, because holding quota allows them to avoid the transactions costs associated with frequently trading in the quota market, or buffer against back luck of encountering a larger than expected amount of a non-target species.  We take the fact that sectors hold back a percentage of their vessels' total quota as circumstantial evidence that there is some value to holding inventory of quota.
+
+Not all of these sources of value will be positive.  The most critical factor is whether the quota levels set by fisheries managers are at levels that are likely to constrain the fishery.  When quota levels are low enough to have a probability of constraining the fishery, the three sources of value may all be positive. 
+
+
+Scarcity value is the easiest to understand.  The existence of scarcity value depends on quotas that are binding; when the unregulated equilibrium quantity is less than the quota, there cannot be scarcity value.  This is similar to the Salmon quota story on the west coast. Therefore, we expect the scarcity value to be high for stocks that are frequently caught with other stocks and those stocks have either high prices or large amounts of quota remaining.
+
+As the fishing year progresses, increases in capital asset value are likely to be offset by decreases in option value.  When quota levels are high and very unlikely to bind, we expect neither scarcity value nor option value [@Krishna1996].  This implies no, or little, asset value.  
+
+With additional data and more assumptions about the nature of supply or demand of the characteristics, the inverse demand or supply curves can be estimated.  @Kristofersson2004 and @Hammarlund2015 accomplish this in a high-frequency markets in their examinations of the `ex-vessel` cod markets in Iceland and Sweden respectively.  In those examples, the buyers (processors) are different from the sellers (fishing vessels) and the structure of the market makes it reasonable to believe that, at the time sales occur, the supply is perfectly inelastic.
+
+Specifying a structural model of demand for quota derived from profit maximization, in which the (inverse) demand equation was a function of these factors, could allow us to recover the technology parameters.  Writing this model is complicated.  Empirically estimating a model would be even more difficult because the quantity supplied of quota into the market is likely to be endogenous.  
+--->
+
+### Stage 2 Methods - A corner solution and the Cragg's Hurdle model
+
+<!--
+Alternatively, the equilibrium price of quota may be zero; if so, the initial allocation is greater than the quantity demanded.  The prices of quota take on properties of a corner solution: there are stocks for which the aggregate quantity demanded of quota is well below the total allocation of quota ($z(p)\le 0$).  These stocks will have prices that are zero.  Therefore, we expect only initial endowments, utilization rates, or similar  variables that measure the amount of quota remaining will affect whether a quota price will be zero or positive.  To be concrete, the concept of a Walrasian Equilibrium implies that variables that shift the demand curve for quota, like the *ex-vessel* price of fish or costs of fuel, will not be included the equation that determines whether a stock has a positive or zero quota price.
+-->
+
+The second stage explains variations in the estimated marginal prices, $\hat{r}_{it}$ from Equation \ref{dem1}, using proxies for the sources of value.  Based on the framework of a real option, we assume that the value of quota is determined by two processes. When the amount of quota is "high" (far from constraining), minimal scarcity, option, and capital asset value will exist and quota prices are expected to be low or zero.  When the amount of quota is "low" (constraining with a reasonable probability), we expect quota prices to include all of these value components. 
+
+A two-part model containing an participation and an outcome component can accommodate the corner solution nature of equilibrium prices[^fn_terminology] [@Cragg1971; @Wooldridge2010B] . The participation component of the hurdle model examines the probability that a quota price is positive; we use a probit model for this component. The outcome component explains the variation in positive quota prices; we experimented with truncated linear and exponential functional forms for this component.  A Tobit [@Tobin1958] is a special case of two-part model in which the participation and outcome components of the model are assumed to have the same underlying process, a restriction that we believe is inappropriate in this context [@Wooldridge2010B].  Cragg's [-@Cragg1971] hurdle model, which allows for the underlying processes to differ, requires estimating more parameters and has been used to examine the adoption of agricultural technologies where the corner solution ("do not adopt new technology") is often selected by optimizing agents [@Ricker-Gilbert2011;@Bezu2014;@Verkaart2017].The hurdle model allows for characterization of the effects of independent variables on three quantities: the probability a quota price is positive, the expected value of quota price (the unconditional expectation), and the expected value of positive quota prices (the conditional expectation) [@Wooldridge2010B].  These three effects depend on both the estimated coefficients and the values of the independent variables.  Therefore, we evaluate the partial effects at the actual values of observations in the data and average over these observations. Standard errors were computed using the delta method. We estimation and compute partial effects using Stata with the user written *nehurdle* command [@Sanchez-Penalver2019].
+
+[^fn_terminology]: The participation and outcome nomenclature is slightly awkward in this context, however, we follow the social science convention. 
+
+<!--
+[^fn_AME]: Following convention, the average marginal effects are computed by evaluating the derivative of the quantity of interest (P, E[y], E[Y| y>0]) with respect to continuous variables and the discrete difference for categorical variables. We average over all observations and construct standard errors using the delta method.
+
+Following the notation in @Wooldridge2010B, define $X$ be explanatory variables for the participation and outcome parts of the hurdle model and  $\Phi(\cdot)$ and $\phi(\cdot)$ as the normal cumulative and probability distribution functions respectively. The participation model is (suppressing the $t$ subscripts for quarters):
+
+\begin{equation}
+\label{general_particip}
+P[r=0 | X] = 1-\Phi[X\gamma]
+\end{equation}. 
+
+This is a probit model.  Under the assumption that $r$ conditional on $X$ is a truncated normal distribution with mean $X\beta$ and variance $\sigma^2$, the outcome component for positive quota prices modeled using a truncated regression:
+
+\begin{equation}
+\label{trunc_hurdle}
+f(r|X, r>0) = [\Phi(\frac{X\beta}{\sigma})]^{-1}(\phi(\frac{r-X\beta}{\sigma})/\sigma).
+\end{equation}
+
+We also experiment with a log-transformed model in which the natural log of $r$ is distributed $N(X\beta, \sigma_2)$:
+
+\begin{equation}
+\label{exp_hurdle}
+f(r|X, r>0) = [\Phi(X\beta /\sigma)]^{-1}(\phi(r-X\beta/\sigma)/\sigma).
+\end{equation}
+We note that the estimated parameters of the participation equation \ref{general_particip} are free to be different from parameters in the outcome equation (either \ref{trunc_hurdle} or \ref{exp_hurdle}).  Use of likelihood ratio tests to select between the linear and exponential functional form are appropriate [@Vuong1989; @Wooldridge2010B]. 
+
+
+Although the math is a little ugly, the hurdle is either a "probit + truncated OLS" or "probit plus OLS on ln(y)".
+
+Data discussion out.-->
+
+
+
+### Stage 2 Methods: A spatial approach to jointness 
+<!--
+This needs an intro.  Maybe not.
+Need a narrative about spatial dependence.
+--->
+
+The technical interactions implied by joint production suggests that the quota price of stock $j$ can be affected by attributes of other stocks; the strength of that effect will be larger for pairs of stocks that are frequently caught together.  We use methods from the spatial econometrics literature to impose restrictions on how attributes of other stocks can affect the quota price of stock $j$ [@Pinkse2002;@LeSage2008;@HalleckVega2015].  We construct Distance- and Inverse-Distance spatial weights matrices to capture the degree of disjointness and jointness in the production process. These spatial weights matrices are based on the co-occurrence of stocks of fish in fishery independent survey data and constructed using the Ruzicka distance measure [@Schubert2014].  For stocks $A$ and $B$, the yearly distance metric is computed as (suppressing the time subscript):
+\begin{equation}
+\label{RU_eqn}
+D_{A,B}= 1-\frac{\sum min(q_i^A,q_i^B)}{\sum max(q_i^A,q_i^B)},
+\end{equation}
+
+where $q_i^A$ is the amount of stock $A$ on tow $i$ divided by the total amount of stock $A$ on all tows and $q_i^B$ is defined analogously.  The distance metric is equal to 1 when stocks $A$ and $B$ are never caught together and equal to 0 when stocks $A$ and $B$ are always caught together.  Because the distance measure is time varying, it can capture changes in environmental (stock) conditions.  For each time period  $t$, the symmetric (17x17) $D_t$ matrix is constructed.  An inverse distance matrix ($ID_t$) is also constructed by taking the reciprocal of distance from Equation \ref{RU_eqn}.  Terms on the diagonal of the inverse distance matrix are set to zero by convention.  $D_t$ and $ID_t$ are stacked into a block diagonal matrices $D$ and $ID$ by fishing quarter with zeros on the off diagonal; there are 38 quarters in the analysis, so the spatial weights matrices $D$ and $W$ are block diagonal 646x646 matrices.  This embodies the quite reasonable assumption that there is no jointness in the catch of stocks $i$ and $j$ at two different points in time (for example, a fishing vessel cannot catch GOM cod in 2010 and GOM Haddock in 2012 on the same trip).  Increases in $D$ reflect disjointness while increases in $ID$ reflect jointness. Spatial weights matrices are often normalized by dividing by the largest absolute eigenvalue [@LeSage2008]. Because distance and inverse distance lags enter the estimating equation, we normalize by the same largest absolute eigenvalue from $D$ and $ID$ matrices. This ensures the estimated effects of the spatial lags are comparable.  
+
+ <!---Quota for SNEMA Winter Flounder was not allocated until 2012 and missing data can present problems for spatial econometric models.  However, in this case,  SNEMA Winter flounder variables during this time would not be expected to affect the quota prices for stocks caught along with it. Therefore, we set this particular part of the weights matrix to zero.de emphasize --->
+
+<!---
+We are interested in a few aspects of the distribution of quota prices. One is the probability of observing non-zero prices and the marginal effects (and elasticities) of some explanatory variables on that probability.  Another is the expected price, conditional on the quota price being positive, and the associated marginal effects (and elasticities) of some explanatory variables on that expectation.  The elasticities are a little complicated, but given by [@Wooldridge2010B].  We will put them here tomorrow.
+--->
+
+<!---
+###  Pure Exchange and a Walrasian Market Equilibrium 
+
+Fish quota are a good used in production; however, the pure exchange economy [@varian1992microeconomic, 315] provides a reasonable conceptual framework for to understand the prevalence of zero and near zero prices.  We assume that individuals, $l$, have a non-negative initial allocations of quota $\omega_l$ and have a continuous demand function for quota, $x_l(r,r\omega_l)$ that is homogeneous of degree zero in $r$, the price of quota. For notational simplicity, we focus on the market of a single stock.  A continuous, aggregate excess demand function, $z(r)$, that is homogenous of degree zero in prices can be written as:
+\begin{equation}
+z(r)=\sum_{i=1}^N [x_i(r,r\omega_i)-\omega_i]
+\end{equation}
+This function will satisfy Walras' law: for all prices, there is zero valued excess demand.
+\begin{equation}
+\label{walras}
+rz(r)\  \equiv 0 
+\end{equation}
+
+Equation \ref{walras} has attributes of a corner solution [@Wooldridge2015].  The equilibrium price may be zero.  Alternatively, there may be no "excess demand" and the total quantity demanded is exactly equal to the total initial allocations.  When this occurs, the equilibrium price is positive.  The simple Walrasian equilibrium concept suggests that positive prices will be observed only in years when the amount of quota used by the fishing fleet is equal to the total amount allocated. While elegant, the simple equilibrium does not fit the data particularly well.  In fact, end-of-year quota usage was greater than 90\% of the total quota allocation just 22 times (out of 204 stock-year combinations); however we observe far more than 22 positive prices for quota.
+
+Notably, the equilibrium model is deterministic, autonomous (independent of time), and for a single stock.  Fishing in the Northeast groundfish fishery is none of these.  However, the pure exchange equilibrium allows us to focus on one phenomenon of the quota market; that we frequently observe prices that are zero. When utilization rates are "very low", we expect prices to be zero, or near zero: quota is simply not scarce.  When utilization rates are "high," we expect positive prices.
+
+ he main takeaway from the Walrasian equilibrium is that we expect two processes to be at work in the market.    Finally, we rule out the possibility of negative quota prices; quota holders can freely dispose of excess quota by simply letting it expire at the end of the fishing year and there are no "use it or lose it" provisions.
+
+Catch, input prices, and output prices are stochastic.  The decision to use quota at early in the fishing year means that it is not available for use later in the year.  Vessel operators catch many quota managed species simultaneously.  Together, these may drive a wedge between the total amount of quota used by the fleet and the total amount allocated.  One way this can occur is through simple uncertainty: individuals may finish the year with extra quota by accident.  They may also intend to carryover a small balance to the next year.  Early in the season, they may be conserving quota of one stock, but this stock may turn out to be difficult to catch or otherwise unprofitable later in the seasons. 
+
+
+### A Reduced form model Demand and Supply in the Second Stage
+  However, the quota market is clearly *not* a pure-exchange economy; quota is used by fishing vessels to catch and land fish.   A quota holding for stock $j$ is a real-option to catch a pound of fish stock $j$ [@Anderson1987].  On every day in the fishing season, the owner faces the choice to use it to go fishing, sell it in the market, or postpone the decision to the next day. Selling it in the market conveys $r_j$. Utilizing it provides a payoff.  For a single-species fishery, the payoff is $p_j-c_j$; where $p_j$ is the output (live) price and $c_j$ is the marginal cost of catching and landing that fish.  The quota holder therefore fishes if $p_j-c_j \ge r_j$ and sells quota otherwise.
+
+Northeast groundfish is a multispecies fishery, the decision rule is slightly more complicated.  Because of the interdependence in the process by stocks of fish are caught [@Squires1987; @Scheld2018], we expect the payoff from using quota to be a little different than in the single species case. The payoff for using quota of stock $j$ should also include additional profits from all the other stocks of fish.  
+
+
+we denote this as $\sum_{l \neq j} p_lq_{jl}$, where $q_{jl}$  captures how "joint" stocks $j$ and $l$ are. We assume this does not result in cost changes.  Therefore, we expect the critical point of the sell-use decision rule to become:
+
+\begin{equation}
+\label{equation_joint}
+p_j  -c_j + \sum_{l \neq j} p_lq_{jl} \ge r_j
+\end{equation}
+
+Equation \ref{equation_joint} suggests that the equilibrium price of stock $j$ will be related to output price of stock $j$, cost proxies, and a summation that captures the revenue from other stocks.  We also note that, in addition to being infeasible to estimate that many parameters, it is not clear that the marginal effect of changes in (jointness-adjusted) output prices of stock $l$ on all other stocks should be constant. 
+
+In a deterministic setting, (inverse) demand for quota would depend on output (fish) prices, input (fuel labor) prices , and controls that capture the relationship between effort and caught.  These might include gear types, fishing locations, time of the year, or biological characteristics of the fish.  As noted by @Newell2005, it is difficult to specify, this relationship, let alone measure some of these factors.  We therefore follow other researchers  [@Newell2005; @Jin2019] and take a reduced form approach; allowing the price of quota to be a function of some of these factors.
+
+We note that quota for fish stock $i$ could be either a complement or a substitute for fish stock $j$.  Consider two stocks that are often caught together. We would expect that the quota for these stocks would be complements;an exogenous increase in the availability of quota for stock stock $i$ would expand the demand curve for quota of stock $j$ and cause the quota price of stock $j$ to increase. 
+
+Alternatively, consider stock $k$ that is never (or infrequently) caught along with stock $j$.  We would expect $j$ and $k$ to be substitutes;an exogenous increase in the availability of quota for stock stock $k$ would contract the demand curve for quota of stock $j$ and cause the quota price of stock $j$ to decrease.
+
+an exogenous increase in the quota price of stock $k$ would expand the demand curve for stock $j$ and cause the quota price of stock $j$ to increase. Similarly, --->
+
+### Stage 2 Methods - Data and Model Selection 
+
+The results of the first stage are used as dependent variables in the second stage.  The GARFO quota monitoring databases were used to construct quarterly usage of quota and fish prices, both expressed in live pounds.  The same databases were also used to construct the annual proportion of each stock that was caught on a trip with a fishery observer. Fishery independent data used to construct the spatial weights matrices were extracted from the NMFS bottom-trawl and Massachusetts Department of Marine Fisheries inshore survey databases; both the spring and fall surveys were used [@Reid1999].  This is a fishery independent datastream that is designed to provide consistently-collected data for stock assessment.  Tow-level data were aggregated to the stock area using the stock area boundary definitions[^stock_area].  Distance measures constructed using abundance (numbers of fish) and total weight (pounds of fish) were similar; we used weight to construct the distances in \ref{RU_eqn} for the econometric models.  Figure \ref{fig:Distance_illustration} illustrates the distances for two stocks, GOM cod and Plaice, the full set of distances can be found in the Appendix.  In the fishery independent surveys, GOM cod is commonly caught with the other stocks in the Gulf of Maine: CCGOM Yellowtail Flounder, GOM haddock, GOM Winter Flounder. It is also caught with some of the unit stocks like plaice, pollock, and less commonly redfish, white hake, and witch flounder. Plaice is commonly caught with some of the flatfish, like CCGOM yellowtail flounder, Witch flounder, GOM winter flounder and some roundfish, like GOM cod, GOM haddock, redfish, and white hake.  
+These data were supplemented with information on at-sea monitoring levels  [@GARFO2021] and sector sub-ACLs (total quota allocated)[^quota_mon].  In the second stage, all prices were normalized to the real 2010 USD using the GDP Implicit Price deflator[^gdp_def]. 
+
+
+```{r Distance_illustration, fig.show = "hold", out.width = "48%", fig.cap="Distances from Gulf of Maine cod (left) and Plaice (right) to other stocks using weights from the fishery independent surveys. Distance=1 indicates stocks were never caught together. Distance=0 indicates stocks were always caught together.",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,"overlap",paste0("RUT_distance_",c(8,11),".png")))
+```
+
+[^stock_area]: https://www.fisheries.noaa.gov/resource/map/northeast-groundfish-stock-areas and https://www.fisheries.noaa.gov/resource/map/united-states-canada-northeast-groundfish-management-areas. Accessed on Feb 4, 2022.
+
+[^quota_mon]: https://www.greateratlantic.fisheries.noaa.gov/ro/fso/reports/h/nemultispecies.html. Accessed on Feb 4, 2022.  Prior to 2010, the fishery was managed with target TACs; for the two transboundary stocks GBE/GBW cod and haddock) these was obtained from TRAC Status Report 2015/01 and TRAC Status Report 2015/02.
+
+[^gdp_def]: https://fred.stlouisfed.org/series/GDPDEF. Accessed on Feb 4, 2022.
+
+Spatial lags of explanatory variables were constructed by matrix multiplying the distance and inverse distance matrices by explanatory variables.  We used the $ID$ and $D$ spatial lags of quota remaining as explanatory variables into the second stage estimating equation.  increases in $ID$ reflect jointness, it is reasonable to expect increases in $IDquota$ to increase quota prices.  Conversely, increases in $D$ reflect disjointness -- therefore increases in $Dquota$ are expected to decrease quota prices. 
+
+Explanatory variables initially included in the probit participation equation are quota remaining, fraction of quota remaining, the proportion of catch observed, and indicator variables for the quarter of the fishing year.  Explanatory variables initially included the outcome equation were quota remaining, fraction of quota remaining, proportion of catch observed, quarterly indicators, fuel prices, wage rates, output (fish) prices, and Inverse Distance and Distance weighted spatial lags of quota remaining[^fn_other_specs].  When quota is abundant for a stock, changes in the profitability of using quota, as measured by output prices and spatial lags of quota remaining, will not affect the probability that quota prices are positive. Therefore these explanatory variables are excluded from the participation equation.  The ID and D spatial lag terms are highly correlated with each other.  During the model selection process, this pair of variables were usually jointly important in the model (as measured with joint tests of statistical significance, likelihood ratio tests, and examination of the AIC and BIC) but sometimes individually unimportant, a symptom of collinearity [@Greene2003], one of these variables is dropped from the model to address this when this occurs.  
+
+[^fn_other_specs]: We experimented with specifications that included a year-on-year change in quota remaining (following @Newell2005) to proxy for informational shocks,  year-on-year changes in catch limits to allow for partial adjustment to changing conditions, and categorical variables for a "large" (20% and 50%) increases and decreases in catch limits. None of these explanatory variables were found to explain quota prices.
+ 
+Model selection in the second stage is guided by a combination of classical hypothesis testing (Wald and likelihood ratio tests that sets of coefficients are statistically zero) and examination of information criteria (AIC and BIC). We have relatively few observations (n=640), of which 340 are positive, so parsimony is warranted to avoid overfitting. Output prices are likely to be simultaneously determined with quota prices and therefore endogenous. While we use quota remaining at the start of the quarter to control for aggregate supply of quota; this variable is also plausibly endogenous to quota prices.  @Demarest2019 illustrates mechanisms by which the proportion of the catch on observed trips could be simultaneously determined with quota prices. We use the control-function version of the Durbin-Wu-Hausman test to check for exogeneity [@Wooldridge2015].   Quota remaining dated four quarters earlier, prices date four quarters earlier, and the targeted observer coverage rate ware used as excluded instruments. The DWH tests failed to reject the hypothesis that quota remaining, output prices, and proportion of catch observed are exogenous.
+<!--
+[^fn_control_function]
+[^fn_control_function]:  An auxiliary regression model is estimated which explains the potentially endogenous variables using all exogenous variables and a set of instrumental variables that are correlated with the endogenous explanatory variables but do not affect quota prices directly.  Residuals from the auxiliary regression are added to the hurdle model; statistical significance of the reduced form residuals is evidence that the variables of concern are endogenous. Quota remaining four quarters earlier and prices one- and four-quarters earlier are used as excluded instruments. Instrumental variable approaches can lead to imprecise estimates when excluded instruments are weakly correlated with the endogenous explanatory variables. There is no formal test for weak instruments in this non-linear setting; the high partial correlation of the endogenous variable with the excluded instrument, ranging from 0.66 to 0.8 depending on the exact specification, is used to support the assertion that these are not weak instruments. 
+
+Because fishing conditions vary seasonally, in moderately predicable patters, quota remaining one year (four quarters) earlier will be correlated with current quota remaining, but can neither directly affect quota prices nor be affected by any shocks to quota prices.  Therefore, fourth lags are available as an instrumental variable.  Similarly, because fish prices vary by size and condition; there is some seasonality to prices due to natural variation within the year [See @Lee2013; @Lee2014; and @Hammarlund2015].  Therefore, prices one year (four quarters) earlier will be correlated with current prices, but can neither directly affect quota prices nor be affected by any shocks to quota prices.  Therefore, fourth lags are available as an instrumental variable.  Fish prices also may be relatively consistent from quarter-to-quarter, as the demand curve for fish changes slowly over time.  Therefore, first lags of prices are an additional reasonable instrument.[^no_qr]  Employing an instrumental variable approach will lead to unbiased coefficient estimates.  However, weak instruments, in which the excluded variable is not highly correlated with the endogenous variable, can lead to much less precise estimates.  Tests of weak instruments are available for linear models[@Stock2005; @Skeels2018], but not for nonlinear ones.  We rely on the high partial correlation of the endogenous variable with the excluded instrument, ranging from 0.66 to 0.8 depending on the exact model, to support the assertion that these are not weak instruments. 
+
+[^no_qr]: Because the allocated quota changes sharply from year to year, the first lag of quota remaining is not used as an instrument because the abrupt changes at the beginning of the fishing year may substantially worsen the fit of the auxiliary model and make the second-stage estimates less precise. 
+-->
+
+There were two variants of the initial second-stage model: an exponential and a linear form for the level equation.  When a quota price in the first stage could not be estimated, these prices were assumed to be zero.  We also estimate a set of second stage models where these types of observations were omitted; this reduces the sample size to just 388 observations. In the hurdle model, only observations with positive prices are used to estimate the outcome equation; therefore, changing the sample in this way only affects parameters estimated in the participation equation. Our first-stage econometric model also estimated a small number of negative prices, implying that a quota holder has to pay a buyer to take away quota.   If quota prices were truly negative, it would be optimal to simply let the quota expire at the end of the year.  Upon inspecting these results further, we found that most of these negative point estimates are due to statistical imprecision and those negative prices were set to zero for the second stage. 
+
+<!---
+See the wrapper file
+\stata_code\analysis\wrapper_second_stage_exploratory"
+\stata_code\analysis\table making\second_stage_summary_stats.do"
+--->
+Table \ref{second_summary_split0} provides some insight into the differences between stocks with positive and zero prices of quota. Stocks with positive prices tend to have higher output prices and lower quota remaining, both in absolute and proportional terms. They also tend to have slightly higher spatial lags of quota remaining. The fraction of catch observed and fraction of trips observed did not systematically differ for positive or zero priced quota.
+
+<!---
+Don't need this guy anymore
+\singlespacing
+\begin{table}
+  \begin{center}
+    \begin{scriptsize}
+      \input{./tables/second_stage_summary.tex}
+      \caption{Summary Statistics for the Second Stage \label{second_summary}}
+    \end{scriptsize}
+  \end{center}
+\end{table}
+--->
+
+
+\singlespacing
+\begin{table}[htbp]
+  \begin{center}
+\begin{scriptsize}
+    \input{./tables/second_stage_split0.tex}
+    \caption{Summary statistics for the second stage, positive and zeros separately. Means with standard deviations below in parentheses.  \label{second_summary_split0}}
+\end{scriptsize}
+  \end{center}
+\end{table}
+\doublespacing
+
+
+<!---
+
+\singlespacing
+\begin{table}
+  \begin{center}
+\begin{scriptsize}
+    \input{./tables/second_stage_split_qtr.tex}
+    \caption{Summary Statistics for the Second Stage, by Quarter \label{second_summary_split_qtr}}
+\end{scriptsize}
+  \end{center}
+\end{table}
+
+
+
+
+
+\singlespacing
+\begin{table}
+  \begin{center}
+    \begin{scriptsize}
+      \input{./tables/second_stage_split_qtrbpos.tex}
+      \caption{Summary Statistics for the Second Stage by quarter, positives only \label{second_summary_splitqtrbpos}}
+    \end{scriptsize}
+  \end{center}
+\end{table}
+
+
+
+\singlespacing
+\begin{table}
+  \begin{center}
+\begin{scriptsize}
+    \input{./tables/second_stage_split_qtrb0.tex}
+    \caption{Summary Statistics for the Second Stage by quarter, zero prices only \label{second_summary_splitqtrb0}}
+\end{scriptsize}
+  \end{center}
+\end{table}
+--->
+\clearpage
+
+
+# Results 
+
+## Stage 1 - Recovering the price of quota
+ 
+The quarterly models of quota prices fit the data quite well, with very high $R^2$ measures (Table \ref{first_stage_r2}).  The marginal prices ($\hat{r}_{it}$) and associated 90\% confidence intervals are presented graphically in Figures \ref{fig:prices_unit} through \ref{fig:pricesGB}. We do not observe particularly strong patterns in prices within a fishing year; sometimes prices rise within a fishing year, sometimes they fall, and sometimes they are roughly constant.  Breaks in the time series indicate a quota price was not estimated in the first stage.  GBE and GBW haddock quota were very thinly traded and prices were difficult to estimate with any degree of precision for these stocks.
+
+\singlespacing
+\begin{table}[htbp]
+  \begin{center}
+  \begin{small}
+    \begin{tabular}{lrrrr}
+    \hline\hline \\
+    Fishing Year & Quarter 1 & Quarter 2 & Quarter 3 & Quarter 4\\ \hline
+     2010&&&0.97&0.87 \\
+&&&(69)&(121) \\
+2011&0.62&0.97&0.98&0.91 \\
+&(105)&(128)&(168)&(187) \\
+2012&0.98&0.98&0.95&0.96 \\
+&(85)&(125)&(96)&(64) \\
+2013&0.98&0.87&0.93&0.79 \\
+&(161)&(94)&(133)&(90) \\
+2014&0.98&0.96&0.98&0.79 \\
+&(98)&(117)&(94)&(70) \\
+2015&0.99&0.92&0.94&0.85 \\
+&(135)&(121)&(142)&(116) \\
+2016&0.91&0.88&0.98&0.89 \\
+&(114)&(130)&(159)&(133) \\
+2017&0.98&0.97&0.95&0.84 \\
+&(139)&(160)&(105)&(133) \\
+2018&0.98&0.88&0.98&0.87 \\
+&(135)&(142)&(114)&(119) \\
+2019&0.95&0.96&0.98&0.95 \\
+&(131)&(96)&(94)&(67) \\
+     \hline\hline
+    \end{tabular}      
+    \caption{$R^2$ and sample size, in parentheses below, for the first-stage models. \label{first_stage_r2}}
+  \end{small}
+  \end{center}
+\end{table}
+\doublespacing
+
+
+
+<!--- make this two level
+
+year on the vertical Q on the horizontal.  
+
+\doublespacing
+
+<!---
+graphing quarterly_ols_coefs.do 
+note: don't include GBE haddock, GBW haddock, Intercept, or Interaction.
+--->
+
+```{r prices_unit, fig.show = "hold", out.width = "48%", fig.cap="Prices of Unit stocks, 2010-2019",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,"quarterly",paste0("priceB_",unit_stock_nums2,".png")))
+```
+
+```{r prices_gomsne, fig.show = "hold", out.width = "48%", fig.cap="Prices of Southern New England (SNE) and Gulf of Maine (GOM and CCGOM) stocks, 2010-2019",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,"quarterly",paste0("priceB_",GOMSNE_stock_nums,".png")))
+```
+
+
+```{r pricesGB, fig.show = "hold", out.width = "48%", fig.cap="Prices of Georges Bank (GB) stocks, 2010-2019.",  fig.align = "center", echo=FALSE}
+tGBstock_nums<-c(2,3,6,7)
+
+knitr::include_graphics(file.path(my_images,"quarterly",paste0("priceB_",GBstock_nums,".png")))
+```
+
+```{r prices_extra, fig.show = "hold", out.width = "48%", fig.cap="Figure titles are not quite right because I made them in a loop. 2010-2020",  fig.align = "center", echo=FALSE, eval=FALSE}
+knitr::include_graphics(file.path(my_images,"quarterly",c("priceB_9999.png", "priceB_1818.png")))
+```
+
+The first stage results for GBE and GBW cod deserve further explanation.  The ability of firms to arbitrage from 2016 onward suggests that the price GBE cod greater than or equal to the price of GBW cod during this time period (Figure \ref{fig:GBE_GBWcod}). This is usually, but not always true.  A 90\% confidence interval is included in the graphs, observations where the upper bound of the confidence interval falls below zero correspond to rejection of the null hypothesis that the price of GBE cod quota is greater than the price of GBW cod at the 95\% significance level. After 2016, there were 5 quarters where this null is rejected: the first two quarters of 2017, the first and third quarters of 2018, and the third quarter of 2019.
+
+```{r GBE_GBWcod, fig.show = "hold", out.width = "48%", fig.cap="Difference between GBE and GBW cod quota prices.",  fig.align = "center", echo=FALSE, eval=TRUE}
+knitr::include_graphics(file.path(my_images,"quarterly","GBEminusGBWcod.png"))
+```
+
+<!---
+Lets look at the proportion of single vs. multispecies trades.  By count and by volume.
+
+1. The GBW cod has much more volume of trades than GBE.
+
+--->
+ 
+
+## Stage 2 - Understanding the Determinants of Quota Prices
+ 
+Table \ref{second_stage_coefs} contains results of linear and exponential hurdle models estimated in the second stage in addition to least squares coefficient estimates for comparison purposes. As measured by AIC and BIC, exponential hurdle model (Column 1) fits slightly better than the linear hurdle model (Column 2). By $R^2$, constructed as the squared correlation between the actual and predicted prices, the linear hurdle model fits better than the exponential hurdle.  The likelihoods corresponding to the hurdle and OLS models are not conformable; so we cannot use AIC or BIC to select between these classes of models.  The p-values for the Durbin-Wu-Hausman test confirm exogeneity of the output prices, quota remaining, and fraction observed variables at reasonable confidence levels. Preliminary models that included fuel prices and the opportunity cost of labor were initially estimated but both were excluded from the final specification; full results are in the Appendix.
+
+<!--
+[^extra_specs]: We also estimated log-linear and log-log hurdle models. The results are qualitatively similar and can be found in the Appendix.
+
+I estimated the most general models and then tested down
+1.  Estimated a "class" of models using a CF approach. 
+    1. Exogeneity of one or both troubling variables, then I reestimated under exog
+      1. Test down using Wald tests.  LR test would be an alternative, but for the clustered SEs
+      1. Look at the ll, AIC, and BIC stats. Sometimes the model suggested by Wald testing does not have the lowest AIC or BIC.  But they are always close
+    1. Endogenity of any troubling rhs vars and I keep the bootstrapped model.
+      1.Test down using Wald tests.
+      1. Look at the ll, AIC, and BIC stats. Sometimes the model suggested by Wald testing does not have the lowest AIC or BIC.  But they are always close
+-->  
+
+The magnitudes of the coefficients are difficult to interpret directly; nevertheless, we briefly summarize them before focusing on the partial effects.  The two hurdle models vary in the outcome equation but have the same participation specification.  In the participation equation, increases in quota remaining decrease the likelihood that quota will trade at a positive price.  This occurs directly, through the quota remaining effect, and indirectly, through the fraction remaining effect.  The fraction of catch that is observed does not have a statistical significant effect on the probability that quota will trade at positive prices.  The negative coefficients on the quarter of year variables indicate that quota that is traded later in the year is increasingly unlikely to trade at a positive price (relative to the first quarter). A Wald test for the equality of the Quarter 2 and Quarter 3 coefficients ($\chi^2_1$=9.54, p=0.002), the Quarter 2 and Quarter 4 coefficients ($\chi^2_1$=42 p$\le$ 0.0001), and the Quarter 3 and Quarter 4 coefficients ($\chi^2_1$=39.12 p$\le$ 0.0001) found they are statistically differ from each other. 
+
+In the outcome equation, increases in the live (output) price of fish and the fraction of catch observed lead to increases in the quota price while increases in quota remaining caused quota prices to decrease. The positive coefficient on fraction of catch observed is evidence in support of the simple model of non-compliance in Section \ref{background}. The negative coefficients on the quarterly indicator variables indicate that quota prices decline after the first quarter of the year.  Wald tests performed on the exponential model results suggest that the Quarter 2 and Quarter 3 coefficients ($\chi^2_1$=2.74, p=0.098) and the Quarter 3 and Quarter 4 coefficients ($\chi^2_1$=0.98 p= 0.33) are not statistically distinguishable.  In somewhat contrast, the  Quarter 2 and Quarter 4 coefficients ($\chi^2_1$=4.89 p$\le$ 0.027) are statistically different.  Wald tests performed on the linear model find that the Q2, Q3, and Q4 coefficients in the outcome equation are not statistically distinguishable from each other. 
+
+Weak to moderate evidence is found that increases in quota of non-joint stocks will decrease the market price of quota. Similarly, weak to moderate evidence is found that increases in quota of joint stocks will increase the market price of quota. The coefficients estimated by OLS (column 3) are directly interpretable as a marginal effect on the expected price of quota due to a small change in the value of a dependent variable.  The signs of the OLS coefficients are identical to the signs of the coefficients in the hurdle models.
+
+\singlespacing
+\begin{table}
+  \begin{center}
+  \begin{small}
+      \input{./tables/small_second_stage_coef_table.tex}
+    \caption{Second stage estimation results from two hurdle and one OLS specification \label{second_stage_coefs}}
+  \end{small}
+  \end{center}
+\end{table}
+\doublespacing
+Three effects of the explanatory variables are of interest.  First, how do explanatory variables affect the expected probability of a positive quota price? Second,  how do explanatory variable affect the expected quota price, conditional on that quota price being positive?   Third, how do explanatory variables affect expected quota prices?  We report Average marginal effects and and graph the marginal effects across a range of values of independent variables.  The marginal effects describe the effect of a one unit change on each of the three quantities.  For the quarterly categorical variables, these are changes compared to the baseline level, the first quarter of the fishing year.  We compute these effects for both hurdle models.
+
+<!---
+There are three expectations of interest, the expected probability of a positive quota price, the expected price (typically referred to as the "unconditional" expectation in the literature), and the expected price for observations with positive prices (typically referred to as the "conditional" expectation).  
+
+\singlespacing
+\begin{table}
+  \begin{center}
+  \begin{scriptsize}
+      \input{./tables/elasticity_linear6.tex}
+    \caption{Elasticity and Discrete effects from a model \label{elasticity6}}
+  \end{scriptsize}
+  \end{center}
+\end{table}
+--->
+
+The participation component of the hurdle is identical for the two specifications; therefore the average marginal effects corresponding to the participation equation are the same (Table \ref{second_stage_prob_fx}). An increase in quota remaining has a large negative effect on the probability of quota being traded at a positive price: an increase of 1,000mt of quota decreases the average probability of a positive price by 2.4\%.  Because the probit is non-linear, the predicted probabilities (left panel of Figure \ref{fig:linearP3_probs}) and marginal effects (right panel of Figure \ref{fig:linearP3_probs}) vary across the range of quota remaining.  When quota remaining is low (say, 200mt), there is a very high probability (approximately 80\%) that prices will be positive.  As the amount of quota remaining increases, the probability of positive quota prices declines, rapidly at first but at a decreasing rate.  The effects of the quarterly indicators are straightforward: relative to the first quarter, quota prices are 21\%, 33\%, and 60\% less likely to be positive in the second, third, and fourth quarters respectively.  Wald tests of equality find that the quarterly effects are statistically different from each other.
+
+\singlespacing
+\begin{table}
+  \begin{center}
+  \begin{scriptsize}
+    \begin{tabular}{lr}
+    \hline\hline\\
+    & Marginal Effects\\\hline
+    \input{./tables/second_stage_prob_margins.tex}\\
+      \hline\hline
+    \end{tabular}      
+    \caption{Marginal effects on the Probability of positive quota prices \label{second_stage_prob_fx}}
+  \end{scriptsize}
+  \end{center}
+\end{table}
+
+\doublespacing
+
+
+```{r linearP3_probs, fig.show = "hold", out.width = "48%", fig.cap="Probability of positive price (left) and marginal effect of quota remaining on Probability of Positive Price (right) as a function of quota Remaining. Black lines are point estimates, gray ranges indicate the 95\\%  confidence interval.",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,"postestimation",c("prob_positive_linear3.png","marginal_prob_positive_linear3.png")))
+```
+
+
+\singlespacing
+\begin{table}
+  \begin{center}
+  \begin{scriptsize}
+    \begin{tabular}{lrrrr}
+    \hline\hline
+    & \multicolumn{2}{c}{Marginal Effects on }& \multicolumn{2}{c}{Marginal Effects on} \\
+    & \multicolumn{2}{c}{Positive Quota Prices }& \multicolumn{2}{c}{Quota Prices} \\  \hline
+      \input{./tables/second_stage_margins.tex}\\
+      \hline\hline
+    \end{tabular}      
+    \caption{Marginal effects on the conditional (left two columns) and unconditional (right two columns) expected price for the exponential and linear hurdle. \label{second_stage_margins}}
+  \end{scriptsize}
+  \end{center}
+\end{table}
+\doublespacing
+
+The marginal effects of changes in independent variables on positive prices depend non-linearly on the parameters and data used in the outcome equation (first and second columns of Table \ref{second_stage_margins}).  While the signs of the marginal effects are quite consistent across the two specifications, the magnitudes of the average marginal effects are a bit more sensitive to the choice of specification.  An increase in the live price of fish of \$1 per pound increases the conditional quota prices by \$0.25-\$0.46 per pound.  The exponential functional form imposes a response that is quite non-linear, which may be unrealistic for higher priced fish (left panel of figure \ref{fig:marginT_price}). 
+
+```{r marginT_price, fig.show = "hold", out.width = "48%", fig.cap="Marginal Effect of Live Price on the Conditional Expected Price for the exponential (left) and linear (right) models.  Black lines are point estimates, gray ranges indicate the 95\\% confidence interval.",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,"postestimation",c("ytrun_dydx_price_exp_P1D.png", "ytrun_dydx_price_linear_P3.png")))
+```
+
+An increase in the quota remaining by 1,000mt decreases positive quota prices by \$0.19 to \$0.22 per pound, depending on the specification.  Figure \ref{fig:marginT_qr} illustrates that this effect is large in magnitude when quota is scarce and that differences between the two specifications occurs when there is little quota remaining.  <!--- Despite this differences, the conditional mean prices predicted by these two models are nearly indistinguishable (Figure \ref{fig:ET_qr}).--->
+
+```{r marginT_qr, fig.show = "hold", out.width = "48%", fig.cap="Marginal Effect of Quota Remaining on the Conditional Expected Price for the exponential (left) and linear (right) models. Black lines are point estimates, gray ranges indicate the 95\\% confidence interval.",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,"postestimation",c("ytrun_dydx_qr_exp_P1D.png", "ytrun_dydx_qr_linear_P3.png")))
+```
+
+The econometric model shows that a 1 basis point increase in the the fraction of the catch observed (say from 20\% to 21\%) will increase positive quota prices by \$0.014 to \$0.018 per pound. The positive coefficient on observer coverage rate in the outcome equation is evidence in support of this theoretical model described in Section \ref{background}.  Figure \ref{fig:marginT_obs} illustrates that this effect is relatively small when a small fraction of the catch is observed and substantially larger when more of the catch is observed. 
+
+One possible explanation for the increasingly large coverage rate effect on quota prices could be the distribution of firm skill at avoiding discards. If this skill is not uniformly distributed (say normally distributed, then at very low levels of observer coverage, only a few (unskilled) firms will find non-compliance profitable.  As observer coverage levels increase, increasingly more firms do so. Eventually the rate of growth of non-compliant firms slows. This implies a quota-price to coverage rate relationship that is S-shaped. However, the highest coverage rate we observed was 58%  and 90% of our observations had coverage rates between 10% and 37%, so we lack data corresponding to high observer coverage rates to examine this in greater detail. 
+
+
+```{r marginT_obs, fig.show = "hold", out.width = "48%", fig.cap="Marginal Effect of Fraction Observed on the Conditional Expected Price for the exponential (left) and linear (right) models. Black lines are point estimates, gray ranges indicate the 95\\% confidence interval.",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,"postestimation",c("ytrun_dydx_observed_exp_P1D.png", "ytrun_dydx_observed_linear_P3.png")))
+```
+
+<!---
+```{r ET_qr, fig.show = "hold", out.width = "48%", fig.cap="Predicted Conditional Prices as a function of Quota Remaining for the exponential (left) and linear (right) models.  Black lines are point estimates, gray ranges indicate the 95\\% confidence interval.",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,"postestimation",c("ytrun_qr_exp_P1D.png", "ytrun_qr_linear_P3.png")))
+```
+--->
+
+The marginal effects of changes in independent variables on expected prices are a combination of the effects from the probit participation equation and the outcome equation (third and fourth columns  of Table \ref{second_stage_margins}). These effects also depend non-linearly on the parameters and data used in the outcome equation and are directly comparable to the coefficients estimated by OLS (third column of Table \ref{second_stage_coefs}).  An increase in the live price of fish of \$1 per pound increases the unconditional quota price by \$0.17-\$0.32 per pound; this is similar to the effect estimated by OLS. The exponential functional form imposes a response that is quite non-linear, which may be unrealistic (left panel of figure \ref{fig:marginC_price}). The marginal effect of quota remaining on unconditional expected prices is large: an increase in quota remaining of 1,000mt will decrease quota prices by approximately \$2; this is a much larger effect than that estimated by OLS.  The large effect of changes in quota remaining from the participation equation is amplified by the effect in the outcome equation.  It is largest in magnitude when there is little quota remaining (Figure \ref{fig:marginC_qr}).  The econometric model shows that a 1 basis point increase in the the fraction of the catch observed (say from 22\% to 23\%) will increase expected quota prices by \$0.01 to \$0.02 per pound. Figure \ref{fig:marginC_obs} illustrates that this effect is relatively small when a small fraction of the catch is observed and substantially larger when more of the catch is observed.
+
+
+```{r marginC_price, fig.show = "hold", out.width = "48%", fig.cap="Marginal Effect of Live Price on the Expected Price for the exponential (left) and linear (right) models.  Black lines are point estimates, gray ranges indicate the 95\\% confidence interval.",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,"postestimation",c("ycen_dydx_price_exp_P1D.png", "ycen_dydx_price_linear_P3.png")))
+```
+
+
+```{r marginC_qr, fig.show = "hold", out.width = "48%", fig.cap="Marginal Effect of Quota Remaining on the Expected Price for the exponential (left) and linear (right) models.  Black lines are point estimates, gray ranges indicate the 95\\% confidence interval.",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,"postestimation",c("ycen_dydx_qr_exp_P1D.png", "ycen_dydx_qr_linear_P3.png")))
+```
+
+```{r marginC_obs, fig.show = "hold", out.width = "48%", fig.cap="Marginal Effect of Fraction Observed on the Expected Price for the exponential (left) and linear (right) models. Black lines are point estimates, gray ranges indicate the 95\\% confidence interval.",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,"postestimation",c("ycen_dydx_observed_exp_P1D.png", "ycen_dydx_observed_linear_P3.png")))
+```
+
+Changes in quota remaining have an indirect effect on the quota prices of other stocks.  A one-unit increase in distance spatial lag quota remaining term will decrease positive prices by \$0.06 to \$0.20.  We interpret this as evidence that increases in quota for nearby stocks increases quota prices by a roughly similar amount.  The quarterly discrete effects in the third and fourth columns of Table \ref{second_stage_margins} indicate that quota prices decline within the fishing year.  Focusing on the linear hurdle model, unconditional quota prices are \$0.22, \$0.32, and \$0.51 per pound lower in the second, third, and fourth quarter of the fishing year.  Wald tests of equality find that effects of the Quarter 2, 3, and 4 variables on the *unconditional* mean quota prices are statistically different from each other while their effects on the *conditional mean* are not.  The differences between the unconditional and conditional effect presented earlier is due to the changes in the probability that a particular stock will trade at a positive price.
+
+
+
+<!---
+
+```{r ET_price, fig.show = "hold", out.width = "48%", fig.cap="Predicted Conditional Prices as a function of Live Price for the exponential (left) and linear (right) models.Black lines are point estimates, gray ranges indicate the 95\\% confidence interval.",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,"postestimation",c("ytrun_price_exp_P1D.png", "ytrun_price_linear_P3.png")))
+```
+--->
+
+
+ 
+<!---
+\singlespacing
+\begin{table}
+  \begin{center}
+  \begin{scriptsize}
+    \begin{tabular}{lrrrr}
+    \hline\hline
+    & \multicolumn{2}{c}{Elasticities of }& \multicolumn{2}{c}{Elasticities of} \\
+    & \multicolumn{2}{c}{Positive Prices }& \multicolumn{2}{c}{Prices} \\  \hline
+      \input{./tables/second_stage_elasticities.tex}\\
+      \hline\hline
+    \end{tabular}      
+    \caption{Elasticities on the conditional (columns 1 and 2) and unconditional (columns 3 and 4) expectations \label{second_stage_elasticities}}
+  \end{scriptsize}
+  \end{center}
+\end{table}
+
+\doublespacing
+
+The elasticities can be interpreted as the effects, in percentage terms, of a 1\% percent change in the independent variables on either the positive prices or all prices.  An increase of quota remaining by 1\% will decrease positive quota prices by 0.45 to 1.21\%, depending on the specification. It will decrease all quota prices by approximately 6\%; a large portion of this effect is due to the higher likelihood of some quota being prices at zero.   
+
+A 1\% increase the quota remaining for all species will decrease the decrease positive prices by 0.74% to 1.2%.  There is weaker evidence that increases in quota for nearby stocks increases quota prices.  This effect is of similar magnitude but in the opposite direction.
+--->
+
+
+#  Discussion and Conclusions
+Quota markets allocate quota efficiently when certain conditions are met. These conditions include having many buyers and sellers, perfect information, no barriers to trade, no economies of scale, and minimal transactions costs.  All of these conditions are rarely present in established markets for commonplace goods like used automobiles [@Akerlof1970], real estate [@Harding2003], or groceries [@Smith2004b], let alone immature quota markets [@Pinkerton2009]. These market imperfections cause losses for society because some potential gains from trade are not realized.  When  market imperfections are small, these losses are likely to be small.  When  market imperfections are large, the market may completely disappear [@Akerlof1970]. While the market for fishing quota is not an ideal setting for testing market efficiency [@Fama1998; @Malkiel2003],  the analysis finds mixed evidence for the proposition that the groundfish market is well functioning efficiently.  
+<!---
+, and policy interventions to reduce these
+
+
+Formally testing for efficient markets has typically been performed using high-frequency data taken from stock markets , which is not possible in this setting.
+
+incremental refinements to the market institutions to can improve the ability of the market to allocate resources to it's best purposes. 
+One of the theoretical advantages to a market-based policy instrument, like an tradable quota, is the ability of firms to adjust their quota holdings in response to price signals in a market. These price signals should encourage firms to use quota more efficiently. --->
+
+We find that trade volumes have increased modestly over the first ten years of the quota system, suggesting that the market is maturing, a finding broadly in line with other research [@Newell2005;@Ropicki2014; @Jin2019; @Vasta2019].  Price differentials between GBE cod and GBW cod after 2016 are sometimes not consistent with economic theory; the price of GBW cod should not be greater than that of GBE cod. We have four possible explanations for this finding. First, the econometric model may not estimate prices well.  We do not believe this is plausible in the first two quarters of 2017, when there were many trades of both stocks and GBW was over \$1 more valuable than GBE cod.  Second, firms that sell their entire allocation of quota typically do so early in the fishing year and sellers reportedly take a discount for doing so. These types of trades, if they disproportionately include GBE cod, may cause the econometric model to assign lower prices to GBE cod. Unfortunately, we cannot identify trades of an entire allocation of quota in our data. The data were inspected for the frequency of multi- and single-stock trades of GBE and GBW cod during these times, but we did not find any correlations between the frequency or importance of multi-stock trades and the GBE-GBW price inversion. Third,  the transactions costs of arbitrage (trading and submitting paperwork to NMFS) may be high enough that quota holders do not do this.  Fourth, quota holders may not have good information about prices.  Further research is clearly warranted to understand the causes of this irregularity and whether a policy change would encourage allocative efficiency. 
+
+In general, we find that quota prices are determined by factors fundamental to the production process in the fishery, suggesting that the market is relatively well-functioning  [@Newell2005; @Jin2019]. In particular, the second stage econometric model illustrates that scarcity matters.  When there is abundant quota, the probit component of the hurdle model indicates quota prices are likely to be zero.  For stocks trading at positive prices, the outcome component of hurdle model indicates increases in quota will reduce quota prices. We also find that increases in fish prices also produce increases in quota prices. In a multispecies fishery, quota of stocks caught together are complements [@Iftekhar2012] and quota prices of all stocks are simultaneously determined [@Hatcher2022].  The spatial-econometric methods find some evidence of complementarity: prices of quota are influenced by quantity supplied of jointly caught stocks.  We find weaker evidence that quota of non-jointly caught stocks are substitutes. 
+
+@Demarest2019 finds that groundfish trips with an observer systematically vary, although differently for trawl and gillnet vessels, from trips without an observer. Increases in the fraction of the observed catch will increase quota prices; this finding can be interpreted as further evidence that firms change their behavior in response to on-board observers.  This suggests that firms are discarding fish with higher quota prices on unobserved trips.  In 2022, managers concerned with both catch accounting and the generalizability of observer collected data to non-observed trips, adjusted fishing regulations to target 100\% observer coverage for four years [@Palmer2017; @GroundfishAmendment23].
+
+Prices in the quota market are driven, in part, by fundamentals. However, it may be difficult for buyers and sellers to discover quota prices. Package and barter trades are a convenient way for parties to take advantage of scope economies and reduce transactions costs  [@Iftekhar2012; @Innes2014a], but they make it difficult for other buyers and sellers to observe the price of an individual stock.   The right-of-first refusal, in which sector members can purchase quota that would be otherwise sold outside of the sector also increases transactions costs.  We speculated that moderate reforms to improve the transparency of the market and lower the transactions costs of participating could improve the ability of the market to allocate quota to the most efficient firms. For example, price caps, in the form of deemed values, can reduce uncertainty about prices and add liquidity to thin markets  [@Townsend2022].  However, all policy changes advantage some and disadvantage others.  
+
+<!---
+Catch shares have led to good outcomes for firms that continue to participate in the fishery along metrics like productivity, output quality, prices, and safety [@Walden2012; @Ardini2018; @Scheld2012;@Pincinato2022; @Pfeiffer2022].  However, policy changes advantage some entities relative to others.   Because many fisheries are overcapitalized and transferability allows firms to adjust the scale of operations, it is not surprising that exit and consolidation frequently occur [@Grafton1996;@Lian2010;@Reimer2014M; @Kroetz2017; @Kroetz2019].  This can be a painful process for owners and operators who have invested years of sweat and toil in honing their craft.
+
+In the northeast US groundfish fishery, quota is allocated based on fishing history, advantaging historical participants relative to future- and non-participants.
+
+Wholesale changes to a firm's business model, say from a fishing firm to a firm that leases quota [@Brandt2005], can be difficult.  One of the major concerns of is the consolidation of the fishing industry, both in terms of quota holdings [@Palsson1995; @Eythorsson1996; @Abayomi2012] and actual activity.  Managers often implement restrictions on the trade or accumulation of rights in order to achieve non-efficiency goals. The markets for rights may also have restrictions on trading designed to achieve either non-efficiency goals with some resulting costs [@Kroetz2015].  @Anderson2004 illustrated how trading limitations could lead to very different final outcomes using a laboratory experiment.  Institutional [@Lee2012] and informational differences [@Ropicki2014] may impact prices in these newly created markets.    
+
+## Future
+I *think* we could apply @Bishop2019's model, if I could just understand how they actually did it.  Unlike real-estate, I (should) have buyer and seller attributes. Would I run a regression of ``net Q'' at the individual-year level on the prices of all quota, the prices of all output, and some sort of individual level effect?  Could I run it at the sector-year level right now?
+--->
+
+\extrafootertext{The authors thank Gregory Ardini, anonymous reviewers, and the journal’s editor for helpful comments and suggestions.  As usual, the authors readily accept responsibility for the remaining errors.  The views expressed in this article are those of the authors and do not represent official positions of NOAA Fisheries.}
+
+\newpage
+
+# References
+<div id="refs"></div>
+

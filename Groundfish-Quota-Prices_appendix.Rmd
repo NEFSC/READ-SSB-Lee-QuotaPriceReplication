@@ -1,0 +1,419 @@
+---
+title: Supplementary Material for Groundfish Quota Prices
+date: "`r format(Sys.time(), '%B %d, %Y')`" 
+documentclass: elsarticle
+csl: fisheries-research.csl
+classoption: 1p
+output:
+  pdf_document: 
+    includes:
+      in_header: preamble-latex.tex
+    keep_tex: yes
+    pandoc_args: --pdf-engine=pdflatex
+    number_sections: true
+  word_document: null
+  html_document: null
+fontsize: 12pt
+bibliography: MLacepricebibliography.bib
+
+---
+
+<!---
+Fisheries Research -- 
+Note, The abstract doesn't show up when you compile the doc. You have to move the \maketitle below the \begin{abstract} \end{abstract} environment, and then build the .tex to .pdf
+
+After building, replace the \maketitle statement with:
+\begin{center}
+Supplementary Material for Groundfish Quota Prices
+\end{center}
+
+
+
+--->
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(here)
+here::i_am("Groundfish-Quota-Prices_appendix.Rmd")
+my_projdir<- here()
+
+# This file needs to be run 1 time (ever). It sets up folders. After your first knit, you can comment it out (although leaving it in will not hurt
+#source(file.path(my_projdir,"project_logistics","R_paths_libraries_setup.R"))
+source(file.path(my_projdir,"R_code","project_logistics","R_paths_libraries.R"))
+setwd(my_projdir)
+descriptive_images<-file.path(my_images,"descriptive")
+exploratory_images<-file.path(my_images,"exploratory")
+allstocks<-c("CCGOM_yellowtail","GBE_cod","GBW_cod","GBE_haddock","GBW_haddock","GB_winter","GB_yellowtail","GOM_cod","GOM_haddock","GOM_winter","plaice","pollock","redfish","SNEMA_yellowtail","white_hake","witch_flounder","SNEMA_winter")
+
+GBstocks<-c("GBE_cod","GBW_cod","GBE_haddock","GBW_haddock","GB_winter","GB_yellowtail")
+unit_stocks<-c("plaice","pollock","redfish","white_hake","witch_flounder")
+GOMSNE_stocks<-c("GOM_cod","GOM_haddock","GOM_winter","CCGOM_yellowtail","SNEMA_yellowtail","SNEMA_winter")
+
+
+GBstock_nums<-c(2,3,4,5,6,7)
+unit_stock_nums<-c(11,12,13,15,16,999)
+GOMSNE_stock_nums<-c(14,17,1,8,9,10)
+unit_stock_nums2<-c(11,12,13,15,16)
+
+vintage_string<-"2022_03_04"
+#load in the estimation datasets and coefficients.
+save_out<-paste0("quarterly_estimation_results_",vintage_string,".RData")
+save_out<-file.path(data_main,save_out)
+load(save_out)
+
+
+```
+
+<!---
+Min-Yang's Linux bib is:
+bibliography: "C:/Users/Min-Yang.Lee/Documents/library.bib"
+
+-->
+\beginsupplement
+
+\doublespacing
+
+
+<!---
+
+
+## Descriptives
+
+
+## First stage summary statistics
+Here are the summary statistics tables for the first stage,broken down by Quarter.
+\singlespacing
+\begin{landscape}
+\begin{table}
+  \begin{center}
+\begin{scriptsize}
+    \input{./tables/first_stage_averages_by_yr_POP.tex}
+    \caption{Summary Statistics for the First Stage, by Year \label{first_summary_by_yr}}
+\end{scriptsize}
+  \end{center}
+\end{table}
+
+
+
+\begin{table}
+  \begin{center}
+\begin{scriptsize}
+    \input{./tables/first_stage_2010_2012_POP.tex}
+    \caption{Summary Statistics for the First Stage, by Quarter. 2010-2012 \label{first_summary_pt2012}}
+\end{scriptsize}
+  \end{center}
+\end{table}
+
+
+
+
+\begin{table}
+  \begin{center}
+\begin{scriptsize}
+    \input{./tables/first_stage_2013_2014_POP.tex}
+    \caption{Summary Statistics for the First Stage, by Quarter.2013-2014 \label{first_summary_pt2015}}
+\end{scriptsize}
+  \end{center}
+\end{table}
+
+
+
+\begin{table}
+  \begin{center}
+\begin{scriptsize}
+    \input{./tables/first_stage_2015_2016_POP.tex}
+    \caption{Summary Statistics for the First Stage, by Quarter. 2015-2016  \label{first_summary_pt2016}}
+\end{scriptsize}
+  \end{center}
+\end{table}
+
+
+\begin{table}
+  \begin{center}
+\begin{scriptsize}
+    \input{./tables/first_stage_2017_2018_POP.tex}
+    \caption{Summary Statistics for the First Stage, by Quarter. 2017-2018  \label{first_summary_pt2018}}
+\end{scriptsize}
+  \end{center}
+\end{table}
+
+
+
+
+\begin{table}
+  \begin{center}
+\begin{scriptsize}
+    \input{./tables/first_stage_2019_POP.tex}
+    \caption{Summary Statistics for the First Stage, by Quarter. 2019  \label{first_summary_pt2019}}
+\end{scriptsize}
+  \end{center}
+\end{table}
+\end{landscape}
+
+
+
+
+### number of trades by type of trade
+\iffalse
+graphingA04Q_explore_market_activity.do
+\fi
+
+```{r tradetypeGB, fig.show = "hold", out.width = "48%", fig.cap="\\label{tradetypeGB} Trade counts GB",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(exploratory_images,"market",paste0(GBstocks,"_Qmarket_activity.png")))
+```
+
+```{r tradetypeUnit, fig.show = "hold", out.width = "48%", fig.cap="\\label{tradetypeUnit} Trade counts Unit",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(exploratory_images,"market",paste0(unit_stocks,"_Qmarket_activity.png")))
+```
+
+```{r tradetypeGOM, fig.show = "hold", out.width = "48%", fig.cap="\\label{tradetypeGOM} Trade counts  GOM and SNE",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(exploratory_images,"market",paste0(GOMSNE_stocks,"_Qmarket_activity.png")))
+```
+
+
+
+### Fraction of trades by type of trade
+\iffalse
+first_stage_exploratory1.do
+\fi
+```{r boxtypeGB, fig.show = "hold", out.width = "48%", fig.cap="\\label{boxtypeGB} Trade type fraction over quarter  GB",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(descriptive_images,paste0(GBstocks,"_box_singleQ.png")))
+```
+
+```{r boxtypeUnit, fig.show = "hold", out.width = "48%", fig.cap="\\label{boxtypeUnit} Trade type fraction over quarter Unit",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(descriptive_images,paste0(unit_stocks,"_box_singleQ.png")))
+```
+
+```{r boxtypeGOM, fig.show = "hold", out.width = "48%", fig.cap="\\label{boxtypeGOM} Trade type fraction over quarter  GOM and SNE",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(descriptive_images,paste0(GOMSNE_stocks,"_box_singleQ.png")))
+```
+
+We might see a little more single stock trades towards the end of the year. This might be balancing. Or the result of people divesting all of their holdings at the beginning of the year.
+
+
+### ACE sold  by type of trade
+
+\iffalse
+graphingA05Q_market_volumes.do
+\fi
+
+```{r basketsGB, fig.show = "hold", out.width = "48%", fig.cap="\\label{basketGB} ACE sold in a single and basket trade  GB",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(exploratory_images,"market",paste0(GBstocks,"_Qbasket_fraction.png")))
+```
+
+```{r basketsUnit, fig.show = "hold", out.width = "48%", fig.cap="\\label{basketsUnit} ACE sold in a single and basket trade Unit",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(exploratory_images,"market",paste0(unit_stocks,"_Qbasket_fraction.png")))
+```
+
+```{r basketsGOM, fig.show = "hold", out.width = "48%", fig.cap="\\label{basketsGOM} ACE sold in a single and basket trade GOM and SNE",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(exploratory_images,"market",paste0(GOMSNE_stocks,"_Qbasket_fraction.png")))
+```
+
+
+```{r permit_banks, fig.show = "hold", out.width = "48%", fig.cap="\\label{permit_banks} Fractions sold by the permit banks",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(descriptive_images,c("fraction_of_pounds_by_permit_bank.png","pounds_soldby_permit_bank.png")))
+```
+
+
+### Fraction of ACE sold  by type of trade
+
+```{r fractionbasketsGB, fig.show = "hold", out.width = "48%", fig.cap="\\label{fractionbasketsGB} Fraction of ACE sold in a basket trade  GB",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(exploratory_images,"market",paste0(GBstocks,"_Qbasket_fraction.png")))
+```
+
+```{r fractionbasketsUnit, fig.show = "hold", out.width = "48%", fig.cap="\\label{fractionbasketsUnit} Fraction of ACE sold in a basket trade Unit",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(exploratory_images,"market",paste0(unit_stocks,"_Qbasket_fraction.png")))
+```
+
+```{r fractionbasketsGOM, fig.show = "hold", out.width = "48%", fig.cap="\\label{fractionbasketsGOM} Fraction of ACE sold in a basket trade GOM and SNE",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(exploratory_images,"market",paste0(GOMSNE_stocks,"_Qbasket_fraction.png")))
+```
+
+\pagebreak
+### Overlap Indices by stock
+
+Notes on the overlap indices. 
+
+1. Each panel is the fishery overlap of one stock (In the title) with all the other stocks.  I left off the non-allocated stocks.
+1. If there are 2 pdf's f() and g(), then 
+\begin{equation}
+ OV(f,g)=1- \frac{1}{2} \int | f(x)- g(x)| dx
+\end{equation}
+Believe it or not, this is equivalent to:
+\begin{equation}
+ Cz_{A,B}= \sum_i min(q_i^A, q_i^B)
+\end{equation}
+Where $q_i^A$ is the revenue on trip_id $i$ from stock $A$ divided by aggregate yearly revenue from stock $A$ and $ q_i^B$ is defined similarly.  I also calculated it using , Landings, Catch, and Discards separately. 
+
+1. This is computed using DMIS trip_id's. 
+1. By defintion, the overlap of stock A on itself is 1. Stocks that are often caught together will have an overlap of 1. Stocks that are never caught together will have an overlap of 0.
+1. The indices are symmetric, so there's some duplication in the figures.
+
+Overall Interpretation
+
+1. The Revenue, Landings, and Catch overlaps are all really similar.
+1. Discard overlaps are different. Not sure what to make of them -- because of the assumed discard rates, we could just be discovering GARFO's algorithm for computing assumed discards.
+
+for the Revenue similarities:
+
+1. GBE cod and GBE haddock go together.  They are moderately close to GB Winter, GB Yellowtail, GBW Cod and GBW Haddock.
+1. GBW cod and GBW haddock go together.  They go moderately GB Winter and the Unit stocks Plaice, Pollock, Redfish, White Hake, Witch, and Non-GF. GB YTF association seems to have gone down over time.
+1.  GB Winter and GB Yellowtail go together, but decreasing over time.  Moderately close to the other GB stocks and Witch. Perhaps increase with SNEMA Winter
+1. The Unit stocks all go together.  
+
+--->
+## Distance Indices by stock
+<!---
+ 1-Cz from above is a dissimilarity score.  However, some smart people showed that $Ru=1-(Cz/(2-Cz))$ is a distance function.  This has some good properties. It is zero for identical elements, positive for different elements, symmetric, the triangle inequality holds.  Here are some graphs of $Ru$
+
+
+```{r overlapGB, fig.show = "hold", out.width = "48%", fig.cap="\\label{GB_overlap} Overlap of GB stocks, 2007-2019",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,"overlap",paste0("overlap_",GBstock_nums,".png")))
+```
+
+```{r overlap_unit, fig.show = "hold", out.width = "48%", fig.cap="\\label{unit_overlap} Overlap of Unit stocks, 2007-2019",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,"overlap",paste0("overlap_",unit_stock_nums,".png")))
+```
+
+```{r overlap_gomsne, fig.show = "hold", out.width = "48%", fig.cap="\\label{GOMSNE_overlap} Overlap of GOM and SNE stocks, 2007-2019",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,"overlap",paste0("overlap_",GOMSNE_stock_nums,".png")))
+```
+--->
+The figures \ref{fig:dist_GB} to \ref{fig:dist_gomsne} illustrate the distances between pairs of stocks that are used to construct the spatial weights matrices.
+
+```{r dist_GB, fig.show = "hold", out.width = "48%", fig.cap="Distance of GB stocks, 2007-2019",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,"overlap",paste0("RUT_distance_",GBstock_nums,".png")))
+```
+
+```{r dist_unit, fig.show = "hold", out.width = "48%", fig.cap="Distance of Unit stocks, 2007-2019",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,"overlap",paste0("RUT_distance_",unit_stock_nums2,".png")))
+```
+
+```{r dist_gomsne, fig.show = "hold", out.width = "48%", fig.cap="Distance of GOM and SNE stocks, 2007-2019",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,"overlap",paste0("RUT_distance_",GOMSNE_stock_nums,".png")))
+```
+<!---
+
+\pagebreak
+
+
+## Robustness for Stage 1
+\iffalse
+L02_graphing_first_stage_results
+\fi
+
+Here are the point estimates for some models, but these are in real dollars. Preferred is above. Basic just estimates OLS with no changes. CooksD drop outliers only. Model 2 drops out less than 5:
+
+```{r pricesGB2, fig.show = "hold", out.width = "48%", fig.cap="\\label{GB_prices2} prices of GB stocks, 2010-2020",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,"quarterly",paste0("compare_first_stagesA_",GBstock_nums,".png")))
+```
+
+```{r prices_unit2, fig.show = "hold", out.width = "48%", fig.cap="\\label{unit_prices2} prices of Unit stocks, 2010-2020",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,"quarterly",paste0("compare_first_stagesA_",unit_stock_nums2,".png")))
+```
+
+```{r prices_gomsne2, fig.show = "hold", out.width = "48%", fig.cap="\\label{GOMSNE_prices2} prices of GOM and SNE stocks, 2010-2020",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,"quarterly",paste0("compare_first_stagesA_",GOMSNE_stock_nums,".png")))
+```
+
+```{r prices_extra2, fig.show = "hold", out.width = "48%", fig.cap="\\label{extra_prices2} Other. Figure titles are not quite right because I made them in a loop. 2010-2020",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,"quarterly",c("compare_first_stagesA_9999.png", "compare_first_stagesA_1818.png")))
+```
+
+
+## More robustness
+
+
+Here are the point estimates for some models. Preferred is above. dropout drops out less than 5 obs and recomputes total pounds. zero out1 drops  drop less than 5, drops outliers,  recomputes.  parsim does the same as zero out, but also zeros out the statistically insignificant var before a final estimation.
+
+```{r pricesGB3, fig.show = "hold", out.width = "48%", fig.cap="\\label{GB_prices3} prices of GB stocks, 2010-2020",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,"quarterly",paste0("compare_first_stagesB_",GBstock_nums,".png")))
+```
+
+```{r prices_unit3, fig.show = "hold", out.width = "48%", fig.cap="\\label{unit_prices3} prices of Unit stocks, 2010-2020",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,"quarterly",paste0("compare_first_stagesB_",unit_stock_nums2,".png")))
+```
+
+```{r prices_gomsne3, fig.show = "hold", out.width = "48%", fig.cap="\\label{GOMSNE_prices3} prices of GOM and SNE stocks, 2010-2020",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,"quarterly",paste0("compare_first_stagesB_",GOMSNE_stock_nums,".png")))
+```
+
+```{r prices_extra3, fig.show = "hold", out.width = "48%", fig.cap="\\label{extra_prices3} Other. Figure titles are not quite right because I made them in a loop. 2010-2020",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,"quarterly",c("compare_first_stagesB_9999.png", "compare_first_stagesB_1818.png")))
+```
+--->
+\pagebreak
+
+##  Robustness Checks for Stage 2
+
+Initial specifications included a pair of cost proxies: fuel prices and an opportunity cost of labor.  Because fuel make up a large proportion of total costs, the price of Number 2 Diesel fuel prices in New York Harbor was used as a proxy for trip costs[^fuel_prices].  While crew are typically compensated using a share system [@McConnell2006], quota prices may be responsive to the opportunity costs of labor, as measured by outside employment opportunities.  Data from the Bureau of Labor Statistics's Quarterly Census of Employment and Wages is used to construct wage rate. The crew wage wage was constructed by using the average of Marine Cargo Handling (NAICS 488320), Port and Harbor Operations (NAICS 488310), Packing and Crating (NAICS 488991), and Marinas (NAICS 713930).  Captains wages were constructed from Navigational services to shipping (NAICS 488330). Only regions in the Northeast US were used to construct this wage.  Because vessels targeting groundfish had an average crew size of 2.8, a weighted average (a weight of 1 for the captains wage and 1.8 for the crew wage) is used to construct a labor wage. A full set of summary statistics, is contained in Table \ref{second_summary_split_appendix}.
+
+[^fuel_prices]: https://fred.stlouisfed.org/series/DDFUELNYH. Accessed on Feb 4, 2022.
+
+
+
+\singlespacing
+\begin{table}[htbp]
+  \begin{center}
+\begin{scriptsize}
+    \input{./tables/second_stage_split_appendix.tex}
+    \caption{Summary statistics for the second stage, positive and zeros separately.\label{second_summary_split_appendix}}
+\end{scriptsize}
+  \end{center}
+\end{table}
+\doublespacing
+
+
+
+Fuel prices did not significantly explain quota prices. This is probably because, for each time period (quarter), fuel prices are constant across all the stocks.  Wages were found to have a large, negative impact on quota prices.  The strong cyclicality of wages is likely to cause this surprising result.  Wages are lowest during the first two quarters and highest in the final two quarters.  Quota prices have the exact opposite within-season cycle.  Therefore, wages were excluded from the econometric model under the assumption that this is a spurious correlation; this caused minimal loss of fit.    
+
+
+Table \ref{appendix_exp} contains robustness checks for the second stage exponential model.  Model E1 reproduces the Exponential model in 5.  Model E2 constructs spatial weights based on overlap of fishing revenues instead of overlap of fishery independent survey data.  Model E3 omits the spatial lag terms.  Model E4 uses 1 quarter lagged output prices as an explanatory variable instead of output prices.  Model E5 is the largest specification estimated and includes coefficient estimates for variables that were statistically insignificant or removed the model during the specification process.  Coefficients in the outcome parts of the model, particularly the price and quota remaining components, are reasonably robust to changes in model specification.  The selection part of the model is the same in all specifications.  
+
+\singlespacing
+\begin{table}
+  \begin{center}
+  \begin{scriptsize}
+      \input{./tables/appendix_exponential.tex}
+    \caption{Robustness checks for the second stage exponential model \label{appendix_exp}}
+  \end{scriptsize}
+  \end{center}
+\end{table}
+
+\doublespacing
+
+Table \ref{appendix_linear} contains robustness checks for the second stage linear model.  Model L1 reproduces the linear model in Table 5.  Model L2 constructs spatial weights based on overlap of fishing revenues instead of overlap of fishery independent survey data.  Model L3 omits the spatial lag terms.  Model L4 uses 1 quarter lagged output prices as an explanatory variable instead of output prices.  Model L5 is the largest specification estimated and includes coefficient estimates for variables that were statistically insignificant or removed the model during the specification process.  Coefficients in the outcome parts of the model, particularly the price and quota remaining components, are reasonably robust to changes in model specification.  The selection part of the model is the same in all specifications.  
+
+\singlespacing
+\begin{table}
+  \begin{center}
+  \begin{scriptsize}
+      \input{./tables/appendix_linear.tex}
+    \caption{Robustness checks for the second stage linear model \label{appendix_linear}}
+  \end{scriptsize}
+  \end{center}
+\end{table}
+\doublespacing
+
+In the preferred specification, when quota prices could not be estimated in the first stage, the prices were assumed to be zero.   Alternatively, these could be omitted from the model; Table \ref{second_stage_coefsDROP} contains precisely those results.  For the two hurdle models, only the "participation" equation coefficients are different. This is because the "outcome equation" only uses positive observations and therefore is not affects.  Results are similar to the results in Table 5. 
+
+\singlespacing
+\begin{table}
+  \begin{center}
+  \begin{small}
+      \input{./tables/small_second_stage_coef_tableDROP.tex}
+    \caption{Second stage estimation results from two hurdle and one OLS specification \label{second_stage_coefsDROP}}
+  \end{small}
+  \end{center}
+\end{table}
+
+
+
+\newpage
+
+# References {-}
+<div id="refs"></div>
+
+

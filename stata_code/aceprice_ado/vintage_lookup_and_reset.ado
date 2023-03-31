@@ -44,5 +44,4 @@ program vintage_lookup_and_reset
 			di "Vintage string is now ${vintage_string}"
 
 		}
-
 end

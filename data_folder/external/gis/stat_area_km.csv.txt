@@ -1,0 +1,8 @@
+These are the statistical areas in the US that are in the US territorial waters
+
+I did this by 
+1. Editing the US maritime boundaries to be a "nice" polygon. I kept the outermost boundary (200nm) and hand-edited it so it was a nice polygon. 
+2. Converted it to a polygon using a very small buffer in the XY.
+3. Intersected that resulting polygon with the Statistical areas shape file
+4. Added an extra field and used "calculate geometry" on it.  
+5. Export the results to a csv, but keep only the ID and km^2 field.
