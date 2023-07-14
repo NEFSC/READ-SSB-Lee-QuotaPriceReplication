@@ -1,7 +1,11 @@
 # Quota Prices 
 Code and Data to Replicate 
 
-Lee, M and Demarest, C. 2023. "Groundfish Quota Prices." Fisheries Research 260:106605
+Lee, M and Demarest, C. 2023. "Groundfish Quota Prices." Fisheries Research 260:106605.  
+
+https://doi.org/10.1016/j.fishres.2022.106605
+
+https://repository.library.noaa.gov/view/noaa/48192
 
 # Required stata packages
 
