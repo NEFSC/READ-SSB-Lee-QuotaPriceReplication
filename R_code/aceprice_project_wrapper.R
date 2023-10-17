@@ -1,15 +1,15 @@
 # This decsribes how /what to run.
 
 #### Set things up
-my_projdir<- "/home/mlee/Documents/projects/aceprice"
-my_projdir<-"C:/Users/Min-Yang.Lee/Documents/aceprice"
+my_projdir<- "/home/mlee/Documents/projects/READ-SSB-Lee-QuotaPriceReplication"
+my_projdir<-"C:/Users/Min-Yang.Lee/Documents/READ-SSB-Lee-QuotaPriceReplication"
 
 #this reads in paths and libraries
 # Be careful, there's are a few masked objects (packages with commands with the same name)
 
 source(file.path(my_projdir,"R_code","project_logistics","R_paths_libraries.R"))
 # Reset the vintage_string
-vintage_string<-"2022_03_04"
+vintage_string<-"2023_04_03"
 ##############################################################
 # this DOES NOT run. It is a lightly modified piece of R code from Chad that he uses to estimate prices of quota.
 #source(file.path(R_codedir,"inter_trades_QTR_final.R"))
