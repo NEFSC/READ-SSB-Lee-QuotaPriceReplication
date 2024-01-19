@@ -9,7 +9,7 @@ my_projdir<-"C:/Users/Min-Yang.Lee/Documents/READ-SSB-Lee-QuotaPriceReplication"
 
 source(file.path(my_projdir,"R_code","project_logistics","R_paths_libraries.R"))
 # Reset the vintage_string
-vintage_string<-"2023_04_03"
+vintage_string<-"2024_01_19"
 ##############################################################
 # this DOES NOT run. It is a lightly modified piece of R code from Chad that he uses to estimate prices of quota.
 #source(file.path(R_codedir,"inter_trades_QTR_final.R"))
@@ -17,7 +17,7 @@ vintage_string<-"2023_04_03"
 
 
 ##############################################################
- source(file.path(R_codedir,"project_logistics","R_credentials.R"))
+# source(file.path(R_codedir,"project_logistics","R_credentials.R"))
 
 # A tiny bit of code to just extract the Ace trade data.
   source(file.path(R_codedir,"A1_extract_ace_trade_data.R"))
