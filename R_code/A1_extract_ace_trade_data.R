@@ -19,8 +19,7 @@ get_out_data<-function(){
   out_1<-sqlQuery(o,"select b.year, b.transfer_number, b.from_sector_id, b.to_sector_id, a.stock, a.live_pounds, b.status, 
                    b.compensation, b.transfer_date       
                   from sector.transfers@garfo_nefsc b, sector.transfer_stock@garfo_nefsc a
-                  where b.transfer_number = a.transfer_number and b.status = 'C'")
-  out_1<-sqldf("select * from out_1 where from_sector_id is not null")
+                  where b.transfer_number = a.transfer_number and b.status = 'C' and b.from_sector_id is not NULL")
   out_1$YEAR<-ifelse(out_1$TRANSFER_NUMBER==6379, 2018, out_1$YEAR)
   out_1<-subset(out_1, !(TRANSFER_NUMBER %in% c(6380,6381)))
   out_1<<-out_1
