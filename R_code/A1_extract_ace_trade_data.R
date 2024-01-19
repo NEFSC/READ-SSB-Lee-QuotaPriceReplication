@@ -11,7 +11,7 @@ if(!require(sqldf)) {
 
 ##   This is the data-extraction step from "inter_trades_QTR_final_CD.R" from Chad Feb 22,2021
 
-o<-odbcConnect("sole", uid=id, pwd=solepw, believeNRows=FALSE)
+o<-odbcConnect("sole.nefsc.noaa.gov", uid=id, pwd=solepw, believeNRows=FALSE)
 
 
 
