@@ -1,4 +1,4 @@
-# This is Min-Yang's modification of Chad Demarests's code to estimate the quarterly average price (dollars per pound) of quota.
+# This is Min-Yang's modification of Chad Demarest's code to estimate the quarterly average price (dollars per pound) of quota.
 # This needs an input Rdataset. It cleans/recode, estimate and test various models
 # This code gets exports the estimated coefficients to a table.
 
